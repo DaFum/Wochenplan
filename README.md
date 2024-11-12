@@ -8,7 +8,7 @@ Responsives Design: Benutzerfreundliche Oberfläche, die auf verschiedenen Gerä
 Dunkelmodus: Umschalten zwischen hellem und dunklem Modus für eine angenehme Nutzung bei unterschiedlichen Lichtverhältnissen.
 Installation
 ## Repository klonen:
-‘‘‘
+'''
 git clone https://github.com/DaFum/Wochenplan.git
 cd Wochenplan
 Virtuelle Umgebung erstellen:
@@ -24,7 +24,7 @@ Setze die Umgebungsvariable DATABASE_URI oder nutze die voreingestellte SQLite-D
 Anwendung starten:
 
 flask run
-‘‘‘
+'''
 
 ## Nutzung
 Startseite: Auf der Startseite können Benutzer ihre Aufgaben und Lerninhalte für jeden Tag der Woche eingeben.
