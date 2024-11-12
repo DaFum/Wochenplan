@@ -1,5 +1,5 @@
 Flask==3.0.3
-SQLAlchemy==1.4.22
+SQLAlchemy==2.0.36
 Flask-WTF==1.2.2
 flask_weasyprint==1.1.0
 gunicorn==23.0.0
