@@ -278,32 +278,17 @@ def home():
 # PDF download route
 @app.route('/download-pdf')
 def download_pdf():
-    buffer = io.BytesIO()
-    c = canvas.Canvas(buffer, pagesize=letter)
-    c.setFont("Helvetica", 12)
-    y = 750
-
     entries = PlannerEntry.query.all()
+    pdf_content = "<html><body>"
     for entry in entries:
-        c.drawString(50, y, f"{entry.day}:")
-        c.drawString(70, y - 20, f"Fach 1: {entry.subject1} - Material: {entry.material1}")
-        c.drawString(70, y - 40, f"Fach 2: {entry.subject2} - Material: {entry.material2}")
-        c.drawString(70, y - 60, f"Lernfach: {entry.learning_subject} - Aufgabe: {entry.learning_task}")
-        y -= 100
-
-        if y <= 50:
-            c.showPage()
-            c.setFont("Helvetica", 12)
-            y = 750
-
-    c.save()
-    buffer.seek(0)
-    return send_file(
-        buffer,
-        as_attachment=True,
-        download_name='planner.pdf',
-        mimetype='application/pdf'
-    )
+        pdf_content += f"<h2>{entry.day}</h2>"
+        pdf_content += f"<p>Subject 1: {entry.subject1} - Material: {entry.material1}</p>"
+        pdf_content += f"<p>Subject 2: {entry.subject2} - Material: {entry.material2}</p>"
+        pdf_content += f"<p>Learning Subject: {entry.learning_subject} - Task: {entry.learning_task}</p>"
+    pdf_content += "</body></html>"
+    
+    pdf_file = pdfkit.from_string(pdf_content, False)
+    return send_file(io.BytesIO(pdf_file), as_attachment=True, download_name='planner.pdf', mimetype='application/pdf')
 
 if __name__ == '__main__':
     app.run(debug=True)
