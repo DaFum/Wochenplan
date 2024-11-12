@@ -1,22 +1,26 @@
 from flask import Flask, render_template, request, redirect, url_for, send_file, session, flash
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField
+from flask_wtf.csrf import CSRFProtect
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
 import random
 import os
-from reportlab.pdfgen import canvas
-from flask_wtf.csrf import CSRFProtect
+import io
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)  # Secure secret key
+app.secret_key = os.environ.get('SECRET_KEY', 'your-default-secret-key')  # Use a fixed secret key
 csrf = CSRFProtect(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///planner.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI', 'sqlite:///planner.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # Database model
 class PlannerEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    day = db.Column(db.String(20), nullable=False)
+    day = db.Column(db.String(20), nullable=False, unique=True)
     subject1 = db.Column(db.String(100), nullable=False)
     material1 = db.Column(db.String(100))
     subject2 = db.Column(db.String(100), nullable=False)
@@ -72,53 +76,100 @@ days_data = {
      }
 }
 
+# Flask-WTF form class
+class PlannerForm(FlaskForm):
+    subject1 = StringField('Subject 1')
+    material1 = StringField('Material 1')
+    subject2 = StringField('Subject 2')
+    material2 = StringField('Material 2')
+    learning_subject = StringField('Learning Subject')
+    learning_task = StringField('Learning Task')
+    submit = SubmitField('Submit')
+
 # Home route
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    forms = {}
     if request.method == 'POST':
         try:
             for day in days_data.keys():
-                subject1 = request.form.get(f"subject1-{day}")
-                material1 = request.form.get(f"material1-{day}")
-                subject2 = request.form.get(f"subject2-{day}")
-                material2 = request.form.get(f"material2-{day}")
-                learning_subject = request.form.get(f"learning-subject-{day}")
-                learning_task = request.form.get(f"learning-task-{day}")
+                form = PlannerForm(meta={'csrf': False})
+                form.subject1.data = request.form.get(f"subject1-{day}")
+                form.material1.data = request.form.get(f"material1-{day}")
+                form.subject2.data = request.form.get(f"subject2-{day}")
+                form.material2.data = request.form.get(f"material2-{day}")
+                form.learning_subject.data = request.form.get(f"learning-subject-{day}")
+                form.learning_task.data = request.form.get(f"learning-task-{day}")
 
-                if not subject1 or not subject2 or not learning_subject:
+                if not form.subject1.data or not form.subject2.data or not form.learning_subject.data:
                     flash(f"Please fill in all required fields for {day}.", "error")
                     return redirect(url_for('home'))
 
-                entry = PlannerEntry(day=day, subject1=subject1, material1=material1, subject2=subject2, material2=material2, learning_subject=learning_subject, learning_task=learning_task)
-                db.session.add(entry)
+                # Check if an entry for this day already exists
+                entry = PlannerEntry.query.filter_by(day=day).first()
+                if entry:
+                    # Update existing entry
+                    entry.subject1 = form.subject1.data
+                    entry.material1 = form.material1.data
+                    entry.subject2 = form.subject2.data
+                    entry.material2 = form.material2.data
+                    entry.learning_subject = form.learning_subject.data
+                    entry.learning_task = form.learning_task.data
+                else:
+                    # Create new entry
+                    entry = PlannerEntry(
+                        day=day,
+                        subject1=form.subject1.data,
+                        material1=form.material1.data,
+                        subject2=form.subject2.data,
+                        material2=form.material2.data,
+                        learning_subject=form.learning_subject.data,
+                        learning_task=form.learning_task.data
+                    )
+                    db.session.add(entry)
             db.session.commit()
             flash("Data saved successfully!", "success")
         except Exception as e:
             flash(f"An error occurred: {str(e)}", "error")
         return redirect(url_for('home'))
 
-    random_data = {day: {"task": random.choice(data["tasks"]), "tip": random.choice(data["tips"])} for day, data in days_data.items()}
+    random_data = {
+        day: {
+            "task": random.choice(data["tasks"]),
+            "tip": random.choice(data["tips"])
+        } for day, data in days_data.items()
+    }
     return render_template('index.html', days=random_data)
 
 # PDF download route
 @app.route('/download-pdf')
 def download_pdf():
-    file_path = 'planner.pdf'
-    c = canvas.Canvas(file_path)
+    buffer = io.BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
     c.setFont("Helvetica", 12)
-    y = 800
+    y = 750
 
     entries = PlannerEntry.query.all()
     for entry in entries:
         c.drawString(50, y, f"{entry.day}:")
-        c.drawString(70, y-20, f"Fach 1: {entry.subject1} - Material: {entry.material1}")
-        c.drawString(70, y-40, f"Fach 2: {entry.subject2} - Material: {entry.material2}")
-        c.drawString(70, y-60, f"Lernfach: {entry.learning_subject} - Aufgabe: {entry.learning_task}")
+        c.drawString(70, y - 20, f"Fach 1: {entry.subject1} - Material: {entry.material1}")
+        c.drawString(70, y - 40, f"Fach 2: {entry.subject2} - Material: {entry.material2}")
+        c.drawString(70, y - 60, f"Lernfach: {entry.learning_subject} - Aufgabe: {entry.learning_task}")
         y -= 100
 
+        if y <= 50:
+            c.showPage()
+            c.setFont("Helvetica", 12)
+            y = 750
+
     c.save()
-    return send_file(file_path, as_attachment=True)
+    buffer.seek(0)
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name='planner.pdf',
+        mimetype='application/pdf'
+    )
 
 if __name__ == '__main__':
-    csrf.init_app(app)
     app.run(debug=True)
