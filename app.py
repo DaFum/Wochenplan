@@ -8,12 +8,15 @@ from reportlab.lib.pagesizes import letter
 import random
 import os
 import io
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'your-default-secret-key')  # Use a fixed secret key
+app.secret_key = os.getenv('SECRET_KEY', 'your-default-secret-key')  # Use the secret key from .env
 csrf = CSRFProtect(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI', 'sqlite:///planner.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI', 'sqlite:///planner.db')  # Use the database URI from .env
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
