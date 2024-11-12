@@ -1,15 +1,18 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
 :root {
-    --color-background: #f4f7fc;
-    --color-text: #333;
-    --color-primary: #2563eb;
-    --color-secondary: #2b6cb0;
-    --color-accent: #60a5fa;
-    --color-border: #d1d5db;
-    --color-highlight: #e0f2fe;
+    --color-background: #f0f2f5;
+    --color-text: #212529;
+    --color-primary: #007bff;
+    --color-secondary: #6c757d;
+    --color-accent: #17a2b8;
+    --color-border: #ced4da;
+    --color-highlight: #e9ecef;
     --color-light: #ffffff;
-    --color-dark-background: #1a202c;
-    --color-dark-text: #e2e8f0;
-    --color-muted: #6b7280;
+    --color-dark-background: #343a40;
+    --color-dark-text: #f8f9fa;
+    --color-muted: #6c757d;
 }
 
 /* General styles */
@@ -24,88 +27,104 @@ body {
 
 /* Title styling */
 .title {
-    color: var(--color-secondary);
-    font-size: 2.5em;
-    margin-bottom: 20px;
+    color: var(--color-primary);
+    font-size: 3em;
+    margin-bottom: 30px;
     text-align: center;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 /* Planner container styling */
 .planner {
     background-color: var(--color-light);
     border: 1px solid var(--color-border);
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    padding: 25px;
-    max-width: 900px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    max-width: 800px;
     margin: 20px auto;
 }
 
 /* Task and learning task styling */
 .task, .learning-task {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 10px 0;
+    flex-direction: column;
+    margin: 20px 0;
     background-color: var(--color-highlight);
-    padding: 10px;
+    padding: 20px;
     border-radius: 8px;
     border: 1px solid var(--color-border);
-    transition: background-color 0.3s, transform 0.2s;
+    transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 .task:hover, .learning-task:hover {
     background-color: var(--color-accent);
-    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
-/* Label and input styling */
-label {
-    font-weight: bold;
-    margin-right: 10px;
+.task label, .learning-task label {
+    margin-bottom: 8px;
+    font-weight: 700;
     color: var(--color-text);
 }
 
-select, input {
-    flex: 1;
-    padding: 8px;
+.task select, .task input, .learning-task select, .learning-task input {
+    width: 100%;
+    padding: 12px;
     border: 1px solid var(--color-border);
     border-radius: 6px;
     outline: none;
-    font-size: 0.95em;
-    transition: border-color 0.3s;
+    font-size: 1em;
+    margin-bottom: 15px;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-select:hover, input:hover {
+.task select:hover, .task input:hover, .learning-task select:hover, .learning-task input:hover {
     border-color: var(--color-accent);
 }
 
-select:focus, input:focus {
+.task select:focus, .task input:focus, .learning-task select:focus, .learning-task input:focus {
     border-color: var(--color-primary);
-    box-shadow: 0 0 5px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
 }
 
 /* Button styling */
 button {
     background-color: var(--color-primary);
     color: var(--color-light);
-    font-size: 1em;
+    font-size: 1.1em;
     font-weight: bold;
     border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
+    border-radius: 50px;
+    padding: 15px 30px;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    display: block;
+    margin: 40px auto;
 }
 
 button:hover {
-    background-color: var(--color-secondary);
-    transform: translateY(-2px);
+    background-color: var(--color-accent);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(23, 162, 184, 0.3);
 }
 
 button:active {
-    background-color: var(--color-primary);
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* Link styling */
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
 }
 
 /* Dark mode styling */
@@ -118,40 +137,76 @@ body.dark-mode .planner {
     background-color: var(--color-dark-background);
     border-color: var(--color-muted);
     color: var(--color-dark-text);
+    box-shadow: none;
 }
 
 body.dark-mode .task, body.dark-mode .learning-task {
-    background-color: var(--color-dark-muted);
-    border-color: var(--color-dark-highlight);
+    background-color: #495057;
+    border-color: var(--color-muted);
+}
+
+body.dark-mode .task label, body.dark-mode .learning-task label {
+    color: var(--color-dark-text);
+}
+
+body.dark-mode .task select, body.dark-mode .task input, body.dark-mode .learning-task select, body.dark-mode .learning-task input {
+    background-color: var(--color-dark-background);
+    color: var(--color-dark-text);
+    border-color: var(--color-muted);
+}
+
+body.dark-mode button {
+    background-color: var(--color-accent);
+}
+
+body.dark-mode button:hover {
+    background-color: var(--color-primary);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+}
+
+body.dark-mode a {
+    color: var(--color-accent);
 }
 
 /* Dark mode toggle button */
 .dark-mode-toggle {
-    margin: 10px 0;
-    background-color: var(--color-accent);
-    color: var(--color-text);
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: var(--color-primary);
+    color: var(--color-light);
     border: none;
-    border-radius: 6px;
-    padding: 5px 10px;
+    border-radius: 50%;
+    padding: 12px;
     cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s, transform 0.3s;
 }
 
 .dark-mode-toggle:hover {
-    background-color: var(--color-primary);
+    background-color: var(--color-accent);
+    transform: rotate(360deg);
+}
+
+.dark-mode-toggle:focus {
+    outline: none;
 }
 
 /* Flash message styling */
 .flash-messages {
     list-style-type: none;
     padding: 0;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    max-width: 800px;
+    margin: 20px auto;
 }
 
 .flash-messages li {
-    padding: 10px;
+    padding: 15px;
     border-radius: 5px;
     margin-bottom: 10px;
     font-weight: bold;
+    font-size: 1em;
 }
 
 .flash-messages .success {
@@ -164,14 +219,59 @@ body.dark-mode .task, body.dark-mode .learning-task {
     color: #721c24;
 }
 
+body.dark-mode .flash-messages .success {
+    background-color: #155724;
+    color: #d4edda;
+}
+
+body.dark-mode .flash-messages .error {
+    background-color: #721c24;
+    color: #f8d7da;
+}
+
 /* Animations */
 .fade-in {
     opacity: 0;
-    transition: opacity 0.3s;
+    animation: fadeIn 0.6s forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
 }
 
 .slide-up {
     transform: translateY(20px);
     opacity: 0;
-    transition: transform 0.3s, opacity 0.3s;
+    animation: slideUp 0.6s forwards;
+}
+
+@keyframes slideUp {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .planner {
+        padding: 20px;
+    }
+
+    .task, .learning-task {
+        flex-direction: column;
+    }
+
+    button {
+        width: 100%;
+        margin: 30px 0;
+    }
+
+    .dark-mode-toggle {
+        top: 15px;
+        right: 15px;
+        padding: 10px;
+    }
 }
