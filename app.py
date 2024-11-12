@@ -243,12 +243,33 @@ def home():
             flash(f"An error occurred: {str(e)}", "error")
         return redirect(url_for('home'))
 
-    random_data = {
-        day: {
-            "task": random.choice(data["tasks"]),
-            "tip": random.choice(data["tips"])
-        } for day, data in days_data.items()
-    }
+    if 'tasks_used' not in session:
+        session['tasks_used'] = {day: [] for day in days_data.keys()}
+    if 'tips_used' not in session:
+        session['tips_used'] = {day: [] for day in days_data.keys()}
+
+    random_data = {}
+    for day, data in days_data.items():
+        # Aufgaben verwalten
+        unused_tasks = list(set(data['tasks']) - set(session['tasks_used'][day]))
+        if not unused_tasks:
+            # Alle Aufgaben wurden verwendet, zurücksetzen
+            session['tasks_used'][day] = []
+            unused_tasks = data['tasks'].copy()
+        task = random.choice(unused_tasks)
+        session['tasks_used'][day].append(task)
+
+        # Tipps verwalten
+        unused_tips = list(set(data['tips']) - set(session['tips_used'][day]))
+        if not unused_tips:
+            # Alle Tipps wurden verwendet, zurücksetzen
+            session['tips_used'][day] = []
+            unused_tips = data['tips'].copy()
+        tip = random.choice(unused_tips)
+        session['tips_used'][day].append(tip)
+
+        random_data[day] = {"task": task, "tip": tip}
+
     return render_template('index.html', days=random_data)
 
 # PDF download route
