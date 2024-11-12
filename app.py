@@ -3,12 +3,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from flask_wtf.csrf import CSRFProtect
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
 import random
 import os
 import io
 from dotenv import load_dotenv
+from weasyprint import HTML
 
 load_dotenv()
 
@@ -278,7 +277,10 @@ def home():
 # PDF download route
 @app.route('/download-pdf')
 def download_pdf():
+    # Query all PlannerEntry records from your database
     entries = PlannerEntry.query.all()
+    
+    # Create the HTML content for the PDF
     pdf_content = "<html><body>"
     for entry in entries:
         pdf_content += f"<h2>{entry.day}</h2>"
@@ -286,9 +288,17 @@ def download_pdf():
         pdf_content += f"<p>Subject 2: {entry.subject2} - Material: {entry.material2}</p>"
         pdf_content += f"<p>Learning Subject: {entry.learning_subject} - Task: {entry.learning_task}</p>"
     pdf_content += "</body></html>"
-    
-    pdf_file = pdfkit.from_string(pdf_content, False)
-    return send_file(io.BytesIO(pdf_file), as_attachment=True, download_name='planner.pdf', mimetype='application/pdf')
 
-if __name__ == '__main__':
+    # Use WeasyPrint to convert the HTML content to a PDF
+    pdf_file = HTML(string=pdf_content).write_pdf()
+
+    # Return the PDF file as a downloadable response
+    return send_file(
+        io.BytesIO(pdf_file),
+        as_attachment=True,
+        download_name='planner.pdf',
+        mimetype='application/pdf'
+    )
+
+if __name__ == "__main__":
     app.run(debug=True)
