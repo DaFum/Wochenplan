@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: wochenplan-app
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: SECRET_KEY
+        fromDatabase: true
+      - key: DATABASE_URI
+        fromDatabase: true
