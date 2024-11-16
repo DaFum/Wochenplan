@@ -1,0 +1,21 @@
+{
+  "name": "Wochenplan-App",
+  "short_name": "Wochenplan",
+  "description": "Eine App zur Planung deiner Schulwoche",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#007bff",
+  "icons": [
+    {
+      "src": "/static/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
