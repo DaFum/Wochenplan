@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, send_file, session, flash
+from flask import Flask, render_template, request, redirect, url_for, send_file, session, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
@@ -8,21 +8,27 @@ import os
 import io
 from dotenv import load_dotenv
 from weasyprint import HTML
+from datetime import datetime, timedelta
 
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv('SECRET_KEY', 'your-default-secret-key')  # Use the secret key from .env
+app.secret_key = os.getenv('SECRET_KEY', 'your-default-secret-key')
 csrf = CSRFProtect(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI', 'sqlite:///planner.db')  # Use the database URI from .env
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI', 'sqlite:///planner.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+# Konstanten für wiederholte Zeichenketten
+WEEKDAYS = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"]
+SUBJECTS = ["Mathe", "Deutsch", "Englisch", "Biologie", "Chemie", "Physik", "Geschichte", "Geografie", "Kunst", "Musik"]
 
 # Database model
 class PlannerEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    day = db.Column(db.String(20), nullable=False, unique=True)
+    day = db.Column(db.String(20), nullable=False)
+    week_start = db.Column(db.Date, nullable=False)
     subject1 = db.Column(db.String(100), nullable=False)
     material1 = db.Column(db.String(100))
     subject2 = db.Column(db.String(100), nullable=False)
@@ -30,9 +36,13 @@ class PlannerEntry(db.Model):
     learning_subject = db.Column(db.String(100))
     learning_task = db.Column(db.String(100))
 
+    __table_args__ = (db.UniqueConstraint('day', 'week_start', name='_day_week_uc'),)
+
 # Create the database within the app context
 with app.app_context():
     db.create_all()
+    db.Index('idx_week_start', PlannerEntry.week_start)
+    db.Index('idx_day', PlannerEntry.day)
 
 # Weekdays with specific text content
 days_data = {
@@ -198,13 +208,28 @@ class PlannerForm(FlaskForm):
     learning_task = StringField('Learning Task')
     submit = SubmitField('Submit')
 
+def get_random_item(items, used_items):
+    unused_items = list(set(items) - set(used_items))
+    if not unused_items:
+        used_items.clear()
+        unused_items = items.copy()
+    item = random.choice(unused_items)
+    used_items.append(item)
+    return item
+
+def get_week_start(date=None):
+    if date is None:
+        date = datetime.now()
+    return date - timedelta(days=date.weekday())
+
 # Home route
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    forms = {}
     if request.method == 'POST':
         try:
-            for day in days_data.keys():
+            week_start = get_week_start()
+            entries_to_update = []
+            for day in WEEKDAYS:
                 form = PlannerForm(meta={'csrf': False})
                 form.subject1.data = request.form.get(f"subject1-{day}")
                 form.material1.data = request.form.get(f"material1-{day}")
@@ -213,24 +238,23 @@ def home():
                 form.learning_subject.data = request.form.get(f"learning-subject-{day}")
                 form.learning_task.data = request.form.get(f"learning-task-{day}")
 
-                if not form.subject1.data or not form.subject2.data or not form.learning_subject.data:
-                    flash(f"Please fill in all required fields for {day}.", "error")
+                if not all([form.subject1.data, form.subject2.data, form.learning_subject.data]):
+                    flash(f"Bitte fülle alle erforderlichen Felder für {day} aus.", "error")
                     return redirect(url_for('home'))
 
-                # Check if an entry for this day already exists
-                entry = PlannerEntry.query.filter_by(day=day).first()
+                entry = PlannerEntry.query.filter_by(day=day, week_start=week_start).first()
                 if entry:
-                    # Update existing entry
                     entry.subject1 = form.subject1.data
                     entry.material1 = form.material1.data
                     entry.subject2 = form.subject2.data
                     entry.material2 = form.material2.data
                     entry.learning_subject = form.learning_subject.data
                     entry.learning_task = form.learning_task.data
+                    entries_to_update.append(entry)
                 else:
-                    # Create new entry
-                    entry = PlannerEntry(
+                    new_entry = PlannerEntry(
                         day=day,
+                        week_start=week_start,
                         subject1=form.subject1.data,
                         material1=form.material1.data,
                         subject2=form.subject2.data,
@@ -238,65 +262,63 @@ def home():
                         learning_subject=form.learning_subject.data,
                         learning_task=form.learning_task.data
                     )
-                    db.session.add(entry)
+                    db.session.add(new_entry)
+            
+            db.session.add_all(entries_to_update)
             db.session.commit()
-            flash("Data saved successfully!", "success")
+            flash("Daten erfolgreich gespeichert!", "success")
         except Exception as e:
-            flash(f"An error occurred: {str(e)}", "error")
+            flash(f"Ein Fehler ist aufgetreten: {str(e)}", "error")
         return redirect(url_for('home'))
 
     if 'tasks_used' not in session:
-        session['tasks_used'] = {day: [] for day in days_data.keys()}
+        session['tasks_used'] = {day: [] for day in WEEKDAYS}
     if 'tips_used' not in session:
-        session['tips_used'] = {day: [] for day in days_data.keys()}
+        session['tips_used'] = {day: [] for day in WEEKDAYS}
 
-    random_data = {}
-    for day, data in days_data.items():
-        # Aufgaben verwalten
-        unused_tasks = list(set(data['tasks']) - set(session['tasks_used'][day]))
-        if not unused_tasks:
-            # Alle Aufgaben wurden verwendet, zurücksetzen
-            session['tasks_used'][day] = []
-            unused_tasks = data['tasks'].copy()
-        task = random.choice(unused_tasks)
-        session['tasks_used'][day].append(task)
+    random_data = {
+        day: {
+            "task": get_random_item(days_data[day]['tasks'], session['tasks_used'][day]),
+            "tip": get_random_item(days_data[day]['tips'], session['tips_used'][day])
+        } for day in WEEKDAYS
+    }
 
-        # Tipps verwalten
-        unused_tips = list(set(data['tips']) - set(session['tips_used'][day]))
-        if not unused_tips:
-            # Alle Tipps wurden verwendet, zurücksetzen
-            session['tips_used'][day] = []
-            unused_tips = data['tips'].copy()
-        tip = random.choice(unused_tips)
-        session['tips_used'][day].append(tip)
+    return render_template('index.html', days=random_data, subjects=SUBJECTS)
 
-        random_data[day] = {"task": task, "tip": tip}
-
-    return render_template('index.html', days=random_data)
+@app.route('/api/week-data')
+def get_week_data():
+    week_start = get_week_start()
+    entries = PlannerEntry.query.filter_by(week_start=week_start).all()
+    data = {entry.day: {
+        'subject1': entry.subject1,
+        'material1': entry.material1,
+        'subject2': entry.subject2,
+        'material2': entry.material2,
+        'learning_subject': entry.learning_subject,
+        'learning_task': entry.learning_task
+    } for entry in entries}
+    return jsonify(data)
 
 # PDF download route
 @app.route('/download-pdf')
 def download_pdf():
-    # Query all PlannerEntry records from your database
-    entries = PlannerEntry.query.all()
+    week_start = get_week_start()
+    entries = PlannerEntry.query.filter_by(week_start=week_start).all()
     
-    # Create the HTML content for the PDF
     pdf_content = "<html><body>"
     for entry in entries:
         pdf_content += f"<h2>{entry.day}</h2>"
-        pdf_content += f"<p>Subject 1: {entry.subject1} - Material: {entry.material1}</p>"
-        pdf_content += f"<p>Subject 2: {entry.subject2} - Material: {entry.material2}</p>"
-        pdf_content += f"<p>Learning Subject: {entry.learning_subject} - Task: {entry.learning_task}</p>"
+        pdf_content += f"<p>Fach 1: {entry.subject1} - Material: {entry.material1}</p>"
+        pdf_content += f"<p>Fach 2: {entry.subject2} - Material: {entry.material2}</p>"
+        pdf_content += f"<p>Lernfach: {entry.learning_subject} - Aufgabe: {entry.learning_task}</p>"
     pdf_content += "</body></html>"
 
-    # Use WeasyPrint to convert the HTML content to a PDF
     pdf_file = HTML(string=pdf_content).write_pdf()
 
-    # Return the PDF file as a downloadable response
     return send_file(
         io.BytesIO(pdf_file),
         as_attachment=True,
-        download_name='planner.pdf',
+        download_name='wochenplan.pdf',
         mimetype='application/pdf'
     )
 
