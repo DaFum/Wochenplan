@@ -4,140 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wochenplaner für Cleverboys</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/ScrollTrigger.min.js"></script>
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <meta name="theme-color" content="#007bff">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            background-color: #f9f9f9;
-            color: #333;
-            line-height: 1.6;
-            font-size: 16px;
-            padding: 20px;
-        }
-
-        .dark-mode {
-            background-color: #121212;
-            color: #f5f5f5;
-        }
-
-        .dark-mode-toggle {
-            background-color: #03dac6;
-            border: none;
-            color: #000;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .title {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: #007bff;
-        }
-
-        .flash-messages {
-            list-style-type: none;
-            margin-bottom: 20px;
-        }
-
-        .flash-messages li {
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-
-        .planner {
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
-
-        .task, .learning-task {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 20px;
-        }
-
-        label {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        select, input[type="text"] {
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            margin-bottom: 10px;
-        }
-
-        .tip {
-            font-style: italic;
-            color: #555;
-            margin-top: 10px;
-        }
-
-        button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        a {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            color: #007bff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
 </head>
 <body>
-    <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
-    <h1 class="title">MEGA-SCHUL-WOCHENPLANER für CLEVERBOYS!</h1>
+    <header class="sticky-header" role="banner">
+        <nav class="navbar" aria-label="Main Navigation">
+            <ul class="nav-list">
+                <li><a href="#planner">Planner</a></li>
+                <li><a href="#tasks">Tasks</a></li>
+                <li><a href="#download">Download PDF</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main role="main">
+        <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+        <h1 class="title">MEGA-SCHUL-WOCHENPLANER für CLEVERBOYS!</h1>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <ul class="flash-messages">
-            {% for category, message in messages %}
-            <li class="{{ category }}">{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    {% endwith %}
-
-    <form method="POST" action="/">
-         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <div class="planner" id="planner">
-            <p class="fade-in">Name: ____________________ Woche vom: ________________</p>
+        <form method="POST" action="/">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="planner" id="planner">
+ <p class="fade-in">Name: ____________________ Woche vom: ________________</p>
 
             {% for day, content in days.items() %}
             <h2 class="slide-up">{{ day }} - {{ content.task }}</h2>
@@ -192,7 +84,8 @@
             <button type="submit">Speichern</button>
         </div>
     </form>
-    <a href="{{ url_for('download_pdf') }}">PDF herunterladen</a>
+        <a href="{{ url_for('download_pdf') }}" id="download" role="link">PDF herunterladen</a>
+    </main>
 
     <script>
         // Service Worker Registration
