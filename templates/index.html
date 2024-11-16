@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/ScrollTrigger.min.js"></script>
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#007bff">
 </head>
 <body>
     <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
@@ -24,7 +26,7 @@
 
     <form method="POST" action="/">
         {{ csrf_token() }}
-        <div class="planner">
+        <div class="planner" id="planner">
             <p class="fade-in">Name: ____________________ Woche vom: ________________</p>
 
             {% for day, content in days.items() %}
@@ -34,16 +36,9 @@
                 <label for="subject1-{{ day }}">Fach 1:</label>
                 <select id="subject1-{{ day }}" name="subject1-{{ day }}" required>
                     <option value="">Bitte wählen</option>
-                    <option value="Mathe">Mathe</option>
-                    <option value="Deutsch">Deutsch</option>
-                    <option value="Englisch">Englisch</option>
-                    <option value="Biologie">Biologie</option>
-                    <option value="Chemie">Chemie</option>
-                    <option value="Physik">Physik</option>
-                    <option value="Geschichte">Geschichte</option>
-                    <option value="Geografie">Geografie</option>
-                    <option value="Kunst">Kunst</option>
-                    <option value="Musik">Musik</option>
+                    {% for subject in subjects %}
+                    <option value="{{ subject }}">{{ subject }}</option>
+                    {% endfor %}
                 </select>
                 <input type="text" name="material1-{{ day }}" placeholder="Benötigtes Material (z.B. Buch, Arbeitsheft)" value="{{ request.form.get('material1-' ~ day) }}">
             </div>
@@ -51,16 +46,9 @@
                 <label for="subject2-{{ day }}">Fach 2:</label>
                 <select id="subject2-{{ day }}" name="subject2-{{ day }}" required>
                     <option value="">Bitte wählen</option>
-                    <option value="Mathe">Mathe</option>
-                    <option value="Deutsch">Deutsch</option>
-                    <option value="Englisch">Englisch</option>
-                    <option value="Biologie">Biologie</option>
-                    <option value="Chemie">Chemie</option>
-                    <option value="Physik">Physik</option>
-                    <option value="Geschichte">Geschichte</option>
-                    <option value="Geografie">Geografie</option>
-                    <option value="Kunst">Kunst</option>
-                    <option value="Musik">Musik</option>
+                    {% for subject in subjects %}
+                    <option value="{{ subject }}">{{ subject }}</option>
+                    {% endfor %}
                 </select>
                 <input type="text" name="material2-{{ day }}" placeholder="Benötigtes Material (z.B. Buch, Arbeitsheft)" value="{{ request.form.get('material2-' ~ day) }}">
             </div>
@@ -70,16 +58,9 @@
                 <label for="learning-subject-{{ day }}">Fach:</label>
                 <select id="learning-subject-{{ day }}" name="learning-subject-{{ day }}" required>
                     <option value="">Bitte wählen</option>
-                    <option value="Mathe">Mathe</option>
-                    <option value="Deutsch">Deutsch</option>
-                    <option value="Englisch">Englisch</option>
-                    <option value="Biologie">Biologie</option>
-                    <option value="Chemie">Chemie</option>
-                    <option value="Physik">Physik</option>
-                    <option value="Geschichte">Geschichte</option>
-                    <option value="Geografie">Geografie</option>
-                    <option value="Kunst">Kunst</option>
-                    <option value="Musik">Musik</option>
+                    {% for subject in subjects %}
+                    <option value="{{ subject }}">{{ subject }}</option>
+                    {% endfor %}
                 </select>
 
                 <label for="learning-task-{{ day }}">Aufgabe:</label>
@@ -99,10 +80,38 @@
             {% endfor %}
 
             <button type="submit">Speichern</button>
+        </div>
     </form>
     <a href="{{ url_for('download_pdf') }}">PDF herunterladen</a>
 
     <script>
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+
+        // Lazy Loading
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/api/week-data')
+                .then(response => response.json())
+                .then(data => {
+                    for (let day in data) {
+                        document.getElementById(`subject1-${day}`).value = data[day].subject1;
+                        document.getElementById(`subject2-${day}`).value = data[day].subject2;
+                        document.getElementById(`learning-subject-${day}`).value = data[day].learning_subject;
+                        document.getElementById(`learning-task-${day}`).value = data[day].learning_task;
+                        document.querySelector(`input[name="material1-${day}"]`).value = data[day].material1;
+                        document.querySelector(`input[name="material2-${day}"]`).value = data[day].material2;
+                    }
+                });
+        });
+
         // Initialize GSAP and ScrollTrigger animations
         document.addEventListener("DOMContentLoaded", () => {
             gsap.from(".title", { duration: 1.5, y: -50, opacity: 0, ease: "bounce.out" });
