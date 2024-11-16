@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wochenplaner für Cleverboys</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/ScrollTrigger.min.js"></script>
-    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <meta name="theme-color" content="#007bff">
 </head>
 <body>
@@ -26,7 +26,7 @@
 
     <form method="POST" action="/">
         {{ csrf_token() }}
-        <div class="planner" id="planner">
+        <div class="planner">
             <p class="fade-in">Name: ____________________ Woche vom: ________________</p>
 
             {% for day, content in days.items() %}
@@ -96,53 +96,19 @@
             });
         }
 
-        // Lazy Loading
-        document.addEventListener('DOMContentLoaded', function() {
-            fetch('/api/week-data')
-                .then(response => response.json())
-                .then(data => {
-                    for (let day in data) {
-                        document.getElementById(`subject1-${day}`).value = data[day].subject1;
-                        document.getElementById(`subject2-${day}`).value = data[day].subject2;
-                        document.getElementById(`learning-subject-${day}`).value = data[day].learning_subject;
-                        document.getElementById(`learning-task-${day}`).value = data[day].learning_task;
-                        document.querySelector(`input[name="material1-${day}"]`).value = data[day].material1;
-                        document.querySelector(`input[name="material2-${day}"]`).value = data[day].material2;
-                    }
-                });
-        });
-
-        // Initialize GSAP and ScrollTrigger animations
+        // GSAP animations
         document.addEventListener("DOMContentLoaded", () => {
             gsap.from(".title", { duration: 1.5, y: -50, opacity: 0, ease: "bounce.out" });
             gsap.from(".fade-in", { duration: 1, opacity: 0, stagger: 0.3 });
             gsap.from(".slide-up", { duration: 1, y: 50, opacity: 0, stagger: 0.3 });
-
-            // ScrollTrigger animations
-            gsap.registerPlugin(ScrollTrigger);
-            gsap.from(".task, .learning-task", {
-                scrollTrigger: {
-                    trigger: ".planner",
-                    start: "top 80%",
-                    toggleActions: "play none none none"
-                },
-                duration: 1,
-                x: -100,
-                opacity: 0,
-                stagger: 0.2,
-                ease: "power2.out"
-            });
-
-            gsap.from("button", { duration: 0.8, scale: 0.8, opacity: 0, ease: "back.out(1.7)" });
         });
 
-        // Dark mode toggle with persistence
+        // Dark mode toggle
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
             localStorage.setItem('dark-mode', document.body.classList.contains('dark-mode'));
         }
 
-        // Load dark mode preference
         if (localStorage.getItem('dark-mode') === 'true') {
             document.body.classList.add('dark-mode');
         }
