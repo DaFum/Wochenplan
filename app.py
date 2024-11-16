@@ -9,6 +9,8 @@ import io
 from dotenv import load_dotenv
 from weasyprint import HTML
 from datetime import datetime, timedelta
+from flask import send_from_directory
+
 
 load_dotenv()
 
@@ -284,6 +286,10 @@ def home():
     }
 
     return render_template('index.html', days=random_data, subjects=SUBJECTS)
+
+@app.route('/manifest.json')
+def manifest():
+    return send_from_directory('static', 'manifest.json')
 
 @app.route('/api/week-data')
 def get_week_data():
