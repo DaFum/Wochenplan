@@ -135,7 +135,7 @@
     {% endwith %}
 
     <form method="POST" action="/">
-        {{ csrf_token() }}
+         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="planner" id="planner">
             <p class="fade-in">Name: ____________________ Woche vom: ________________</p>
 
