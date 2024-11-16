@@ -116,28 +116,21 @@
         });
 
         // Initialize GSAP and ScrollTrigger animations
-        document.addEventListener("DOMContentLoaded", () => {
-            gsap.from(".title", { duration: 1.5, y: -50, opacity: 0, ease: "bounce.out" });
-            gsap.from(".fade-in", { duration: 1, opacity: 0, stagger: 0.3 });
-            gsap.from(".slide-up", { duration: 1, y: 50, opacity: 0, stagger: 0.3 });
+document.addEventListener("DOMContentLoaded", () => {
+    gsap.from(".title", { duration: 1.2, y: -30, opacity: 0, ease: "power3.out" });
+    gsap.from(".card", { duration: 0.8, opacity: 0, stagger: 0.2, ease: "power2.out" });
 
-            // ScrollTrigger animations
-            gsap.registerPlugin(ScrollTrigger);
-            gsap.from(".task, .learning-task", {
-                scrollTrigger: {
-                    trigger: ".planner",
-                    start: "top 80%",
-                    toggleActions: "play none none none"
-                },
-                duration: 1,
-                x: -100,
-                opacity: 0,
-                stagger: 0.2,
-                ease: "power2.out"
-            });
-
-            gsap.from("button", { duration: 0.8, scale: 0.8, opacity: 0, ease: "back.out(1.7)" });
+    // Button hover effect
+    const buttons = document.querySelectorAll("button");
+    buttons.forEach(button => {
+        button.addEventListener("mouseenter", () => {
+            gsap.to(button, { scale: 1.05, duration: 0.3 });
         });
+        button.addEventListener("mouseleave", () => {
+            gsap.to(button, { scale: 1, duration: 0.3 });
+        });
+    });
+});
 
         // Dark mode toggle with persistence
         function toggleDarkMode() {
