@@ -1,6 +1,7 @@
 /* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@300;500;700&display=swap');
 
+/* Root Variables */
 :root {
     --color-background: #f0f2f5;
     --color-text: #212529;
@@ -15,18 +16,59 @@
     --color-muted: #6c757d;
 }
 
-/* General styles */
+/* General Reset and Styling */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', 'Montserrat', sans-serif;
+}
+
 body {
     font-family: 'Roboto', sans-serif;
     background-color: var(--color-background);
     color: var(--color-text);
+    line-height: 1.6;
+    font-size: 16px;
     padding: 20px;
     margin: 0;
     transition: background-color 0.3s, color 0.3s;
-    line-height: 1.6;
 }
 
-/* Title styling */
+/* Sticky Header Styling */
+.sticky-header {
+    background-color: var(--color-primary);
+    color: var(--color-light);
+    padding: 10px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-around;
+}
+
+.nav-list {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.nav-list a {
+    color: var(--color-light);
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.nav-list a:hover {
+    color: #ffcc00;
+}
+
+/* Title Styling */
 .title {
     color: var(--color-primary);
     font-size: 2.5rem;
@@ -37,18 +79,34 @@ body {
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Planner container styling */
+/* Planner and Card Layout */
 .planner {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
     background-color: var(--color-light);
     border: 1px solid var(--color-border);
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
     padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
     max-width: 900px;
     margin: 20px auto;
 }
 
-/* Task and learning task styling */
+.card {
+    background-color: #fafafa;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* Task and Learning Task Styling */
 .task, .learning-task {
     display: flex;
     flex-direction: column;
@@ -91,9 +149,9 @@ body {
     box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
 }
 
-/* Button styling */
+/* Button Styling */
 button {
-    background-color: var(--color-primary);
+    background: linear-gradient(135deg, var(--color-primary), #0056b3);
     color: var(--color-light);
     font-size: 1em;
     font-weight: bold;
@@ -107,7 +165,7 @@ button {
 }
 
 button:hover {
-    background-color: var(--color-accent);
+    background: linear-gradient(135deg, var(--color-accent), #003f7f);
     transform: translateY(-3px);
     box-shadow: 0 6px 15px rgba(23, 162, 184, 0.2);
 }
@@ -117,7 +175,7 @@ button:active {
     box-shadow: none;
 }
 
-/* Link styling */
+/* Link Styling */
 a {
     color: var(--color-primary);
     text-decoration: none;
@@ -129,72 +187,7 @@ a:hover {
     text-decoration: underline;
 }
 
-/* Dark mode styling */
-body.dark-mode {
-    background-color: var(--color-dark-background);
-    color: var(--color-dark-text);
-}
-
-body.dark-mode .planner {
-    background-color: var(--color-dark-background);
-    border-color: var(--color-muted);
-    color: var(--color-dark-text);
-    box-shadow: none;
-}
-
-body.dark-mode .task, body.dark-mode .learning-task {
-    background-color: #495057;
-    border-color: var(--color-muted);
-}
-
-body.dark-mode .task label, body.dark-mode .learning-task label {
-    color: var(--color-dark-text);
-}
-
-body.dark-mode .task select, body.dark-mode .task input, body.dark-mode .learning-task select, body.dark-mode .learning-task input {
-    background-color: var(--color-dark-background);
-    color: var(--color-dark-text);
-    border-color: var(--color-muted);
-}
-
-body.dark-mode button {
-    background-color: var(--color-accent);
-}
-
-body.dark-mode button:hover {
-    background-color: var(--color-primary);
-    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
-}
-
-body.dark-mode a {
-    color: var(--color-accent);
-}
-
-/* Dark mode toggle button */
-.dark-mode-toggle {
-    position: fixed;
-    top: 15px;
-    right: 15px;
-    background-color: var(--color-primary);
-    color: var(--color-light);
-    border: none;
-    border-radius: 50%;
-    padding: 10px;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.3s, transform 0.3s;
-}
-
-.dark-mode-toggle:hover {
-    background-color: var(--color-accent);
-    transform: rotate(360deg);
-}
-
-.dark-mode-toggle:focus {
-    outline: none;
-}
-
-/* Flash message styling */
+/* Flash Message Styling */
 .flash-messages {
     list-style-type: none;
     padding: 0;
@@ -221,14 +214,74 @@ body.dark-mode a {
     color: #721c24;
 }
 
-body.dark-mode .flash-messages .success {
-    background-color: #155724;
-    color: #d4edda;
+/* Dark Mode */
+body.dark-mode {
+    background-color: var(--color-dark-background);
+    color: var(--color-dark-text);
 }
 
-body.dark-mode .flash-messages .error {
-    background-color: #721c24;
-    color: #f8d7da;
+body.dark-mode .planner {
+    background-color: #1e1e1e;
+    color: var(--color-dark-text);
+    border-color: var(--color-muted);
+    box-shadow: none;
+}
+
+body.dark-mode .card {
+    background-color: #2c2c2c;
+    box-shadow: 0 1px 5px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .task, body.dark-mode .learning-task {
+    background-color: #495057;
+    border-color: var(--color-muted);
+}
+
+body.dark-mode .task label, body.dark-mode .learning-task label {
+    color: var(--color-dark-text);
+}
+
+body.dark-mode .task select, .task input, .learning-task select, .learning-task input {
+    background-color: var(--color-dark-background);
+    color: var(--color-dark-text);
+    border-color: var(--color-muted);
+}
+
+body.dark-mode button {
+    background-color: var(--color-accent);
+}
+
+body.dark-mode button:hover {
+    background-color: var(--color-primary);
+    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+}
+
+body.dark-mode a {
+    color: var(--color-accent);
+}
+
+/* Dark Mode Toggle Button */
+.dark-mode-toggle {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    background-color: var(--color-primary);
+    color: var(--color-light);
+    border: none;
+    border-radius: 50%;
+    padding: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.dark-mode-toggle:hover {
+    background-color: var(--color-accent);
+    transform: rotate(360deg);
+}
+
+.dark-mode-toggle:focus {
+    outline: none;
 }
 
 /* Animations */
@@ -254,6 +307,11 @@ body.dark-mode .flash-messages .error {
         transform: translateY(0);
         opacity: 1;
     }
+}
+
+/* Smooth Transitions */
+body, .card, .button, .planner {
+    transition: all 0.3s ease-in-out;
 }
 
 /* Responsive Design */
