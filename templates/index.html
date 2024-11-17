@@ -1,3 +1,4 @@
+<!-- File: templates/index.html -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -8,131 +9,83 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/ScrollTrigger.min.js"></script>
-    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-    <meta name="theme-color" content="#007bff">
 </head>
 <body>
-    <header class="sticky-header" role="banner">
-        <nav class="navbar" aria-label="Main Navigation">
+    <header class="dynamic-header" role="banner">
+        <nav class="navbar">
             <ul class="nav-list">
-                <li><a href="#planner">Planner</a></li>
-                <li><a href="#tasks">Tasks</a></li>
-                <li><a href="#download">Download PDF</a></li>
+                {% for day in weekdays %}
+                <li><a href="#{{ day }}" class="tab-link">{{ day }}</a></li>
+                {% endfor %}
             </ul>
         </nav>
     </header>
-    
-    <main role="main">
-        <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+
+    <main>
+        <button class="dark-mode-toggle" onclick="toggleDarkMode()">Dark Mode</button>
         <h1 class="title">MEGA-SCHUL-WOCHENPLANER für CLEVERBOYS!</h1>
 
-        <form method="POST" action="/">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div class="planner" id="planner">
- <p class="fade-in">Name: ____________________ Woche vom: ________________</p>
+        <div class="tab-content">
+            {% for day in weekdays %}
+            <div class="tab-pane" id="{{ day }}">
+                <h2>{{ day }}</h2>
+                <div class="collapsible-card">
+                    <form method="POST">
+                        <label for="subject1-{{ day }}">Fach 1:</label>
+                        <select id="subject1-{{ day }}" name="subject1-{{ day }}" required>
+                            <option value="">Bitte wählen</option>
+                            {% for subject in subjects %}
+                            <option value="{{ subject.name }}">{{ subject.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="text" name="material1-{{ day }}" placeholder="Benötigtes Material">
 
-            {% for day, content in days.items() %}
-            <h2 class="slide-up">{{ day }} - {{ content.task }}</h2>
-            <p class="fade-in">Hausaufgaben-Check:</p>
-            <div class="task">
-                <label for="subject1-{{ day }}">Fach 1:</label>
-                <select id="subject1-{{ day }}" name="subject1-{{ day }}" required>
-                    <option value="">Bitte wählen</option>
-                    {% for subject in subjects %}
-                    <option value="{{ subject }}">{{ subject }}</option>
-                    {% endfor %}
-                </select>
-                <input type="text" name="material1-{{ day }}" placeholder="Benötigtes Material (z.B. Buch, Arbeitsheft)" value="{{ request.form.get('material1-' ~ day) }}">
-            </div>
-            <div class="task">
-                <label for="subject2-{{ day }}">Fach 2:</label>
-                <select id="subject2-{{ day }}" name="subject2-{{ day }}" required>
-                    <option value="">Bitte wählen</option>
-                    {% for subject in subjects %}
-                    <option value="{{ subject }}">{{ subject }}</option>
-                    {% endfor %}
-                </select>
-                <input type="text" name="material2-{{ day }}" placeholder="Benötigtes Material (z.B. Buch, Arbeitsheft)" value="{{ request.form.get('material2-' ~ day) }}">
-            </div>
+                        <label for="subject2-{{ day }}">Fach 2:</label>
+                        <select id="subject2-{{ day }}" name="subject2-{{ day }}" required>
+                            <option value="">Bitte wählen</option>
+                            {% for subject in subjects %}
+                            <option value="{{ subject.name }}">{{ subject.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="text" name="material2-{{ day }}" placeholder="Benötigtes Material">
 
-            <h3 class="fade-in">Heute lernen für:</h3>
-            <div class="learning-task">
-                <label for="learning-subject-{{ day }}">Fach:</label>
-                <select id="learning-subject-{{ day }}" name="learning-subject-{{ day }}" required>
-                    <option value="">Bitte wählen</option>
-                    {% for subject in subjects %}
-                    <option value="{{ subject }}">{{ subject }}</option>
-                    {% endfor %}
-                </select>
+                        <label for="learning-subject-{{ day }}">Lernfach:</label>
+                        <select id="learning-subject-{{ day }}" name="learning-subject-{{ day }}" required>
+                            <option value="">Bitte wählen</option>
+                            {% for subject in subjects %}
+                            <option value="{{ subject.name }}">{{ subject.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="text" name="learning-task-{{ day }}" placeholder="Aufgabe">
 
-                <label for="learning-task-{{ day }}">Aufgabe:</label>
-                <select id="learning-task-{{ day }}" name="learning-task-{{ day }}">
-                    <option value="">Bitte wählen</option>
-                    <option value="Test">Test</option>
-                    <option value="Diktat">Diktat</option>
-                    <option value="Vokabeln lernen">Vokabeln lernen</option>
-                    <option value="Praktikum vorbereiten">Praktikum vorbereiten</option>
-                    <option value="Experiment wiederholen">Experiment wiederholen</option>
-                    <option value="Essay schreiben">Essay schreiben</option>
-                    <option value="Projektarbeit">Projektarbeit</option>
-                    <option value="Präsentation üben">Präsentation üben</option>
-                </select>
+                        <button type="submit">Speichern</button>
+                    </form>
+                </div>
             </div>
-            <p class="tip fade-in">{{ content.tip }}</p>
             {% endfor %}
-
-            <button type="submit">Speichern</button>
         </div>
-    </form>
-        <a href="{{ url_for('download_pdf') }}" id="download" role="link">PDF herunterladen</a>
     </main>
 
     <script>
-        // Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
-                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                }, function(err) {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
+        // Tab Navigation Logic
+        document.querySelectorAll('.tab-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.style.display = 'none');
+                document.querySelector(link.getAttribute('href')).style.display = 'block';
             });
-        }
-
-        // Lazy Loading
-        document.addEventListener('DOMContentLoaded', function() {
-            fetch('/api/week-data')
-                .then(response => response.json())
-                .then(data => {
-                    for (let day in data) {
-                        document.getElementById(`subject1-${day}`).value = data[day].subject1;
-                        document.getElementById(`subject2-${day}`).value = data[day].subject2;
-                        document.getElementById(`learning-subject-${day}`).value = data[day].learning_subject;
-                        document.getElementById(`learning-task-${day}`).value = data[day].learning_task;
-                        document.querySelector(`input[name="material1-${day}"]`).value = data[day].material1;
-                        document.querySelector(`input[name="material2-${day}"]`).value = data[day].material2;
-                    }
-                });
         });
 
-        // Initialize GSAP and ScrollTrigger animations
-document.addEventListener("DOMContentLoaded", () => {
-    gsap.from(".title", { duration: 1.2, y: -30, opacity: 0, ease: "power3.out" });
-    gsap.from(".card", { duration: 0.8, opacity: 0, stagger: 0.2, ease: "power2.out" });
+        // Set default tab to display
+        document.querySelector('.tab-pane').style.display = 'block';
 
-    // Button hover effect
-    const buttons = document.querySelectorAll("button");
-    buttons.forEach(button => {
-        button.addEventListener("mouseenter", () => {
-            gsap.to(button, { scale: 1.05, duration: 0.3 });
+        // GSAP Animations
+        document.addEventListener("DOMContentLoaded", () => {
+            gsap.from(".title", { duration: 1.2, y: -30, opacity: 0, ease: "power3.out" });
+            gsap.from(".collapsible-card", { duration: 0.8, opacity: 0, stagger: 0.2, ease: "power2.out" });
         });
-        button.addEventListener("mouseleave", () => {
-            gsap.to(button, { scale: 1, duration: 0.3 });
-        });
-    });
-});
 
-        // Dark mode toggle with persistence
+        // Dark mode toggle
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
             localStorage.setItem('dark-mode', document.body.classList.contains('dark-mode'));
@@ -142,6 +95,26 @@ document.addEventListener("DOMContentLoaded", () => {
         if (localStorage.getItem('dark-mode') === 'true') {
             document.body.classList.add('dark-mode');
         }
+
+        // Swipe gestures for mobile
+        let startX;
+        document.addEventListener('touchstart', (e) => startX = e.touches[0].clientX);
+        document.addEventListener('touchend', (e) => {
+            const endX = e.changedTouches[0].clientX;
+            if (startX - endX > 50) {
+                // Swipe left logic: Switch to the next tab
+                const currentTab = document.querySelector('.tab-pane:not([style*="display: none"])');
+                let nextTab = currentTab.nextElementSibling || document.querySelector('.tab-pane');
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.style.display = 'none');
+                nextTab.style.display = 'block';
+            } else if (endX - startX > 50) {
+                // Swipe right logic: Switch to the previous tab
+                const currentTab = document.querySelector('.tab-pane:not([style*="display: none"])');
+                let prevTab = currentTab.previousElementSibling || document.querySelector('.tab-pane:last-child');
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.style.display = 'none');
+                prevTab.style.display = 'block';
+            }
+        });
     </script>
 </body>
 </html>
