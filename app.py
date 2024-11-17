@@ -11,7 +11,6 @@ from weasyprint import HTML
 from datetime import datetime, timedelta
 from flask import send_from_directory
 
-
 load_dotenv()
 
 app = Flask(__name__)
@@ -202,13 +201,13 @@ days_data = {
 
 # Flask-WTF form class
 class PlannerForm(FlaskForm):
-    subject1 = StringField('Subject 1')
-    material1 = StringField('Material 1')
-    subject2 = StringField('Subject 2')
-    material2 = StringField('Material 2')
-    learning_subject = StringField('Learning Subject')
-    learning_task = StringField('Learning Task')
-    submit = SubmitField('Submit')
+    subject1 = StringField('Fach 1', render_kw={"placeholder": "Fach 1"})
+    material1 = StringField('Material 1', render_kw={"placeholder": "Material 1"})
+    subject2 = StringField('Fach 2', render_kw={"placeholder": "Fach 2"})
+    material2 = StringField('Material 2', render_kw={"placeholder": "Material 2"})
+    learning_subject = StringField('Lernfach', render_kw={"placeholder": "Lernfach"})
+    learning_task = StringField('Lernaufgabe', render_kw={"placeholder": "Lernaufgabe"})
+    submit = SubmitField('Speichern')
 
 def get_random_item(items, used_items):
     unused_items = list(set(items) - set(used_items))
@@ -328,8 +327,18 @@ def download_pdf():
         mimetype='application/pdf'
     )
 
+@app.route('/einstellungen', methods=['GET', 'POST'])
+def settings():
+    if request.method == 'POST':
+        # Prozess zur Verwaltung benutzerdefinierter Fächer
+        new_subject = request.form.get('new_subject')
+        if new_subject and new_subject not in SUBJECTS:
+            SUBJECTS.append(new_subject)
+            flash("Neues Fach erfolgreich hinzugefügt!", "success")
+        return redirect(url_for('settings'))
+    
+    return render_template('settings.html', subjects=SUBJECTS)
+
 if __name__ == "__main__":
-
     port = int(os.environ.get("PORT", 10000))
-
     app.run(host="0.0.0.0", port=port)
