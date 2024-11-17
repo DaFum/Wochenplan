@@ -3,145 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wochenplaner für Cleverboys</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/ScrollTrigger.min.js"></script>
-    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-    <meta name="theme-color" content="#007bff">
+    <title>Wochenplan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/gsap.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .tab-content {
+            margin-top: 20px;
+        }
+        .card-header {
+            cursor: pointer;
+        }
+        .gradient-header {
+            background: linear-gradient(90deg, rgba(255,153,102,1) 0%, rgba(255,94,98,1) 50%, rgba(255,0,132,1) 100%);
+        }
+    </style>
 </head>
 <body>
-    <header class="sticky-header" role="banner">
-        <nav class="navbar" aria-label="Main Navigation">
-            <ul class="nav-list">
-                <li><a href="#planner">Planner</a></li>
-                <li><a href="#tasks">Tasks</a></li>
-                <li><a href="#download">Download PDF</a></li>
-            </ul>
-        </nav>
-    </header>
-    
-    <main role="main">
-        <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
-        <h1 class="title">MEGA-SCHUL-WOCHENPLANER für CLEVERBOYS!</h1>
-
-        <form method="POST" action="/">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div class="planner" id="planner">
- <p class="fade-in">Name: ____________________ Woche vom: ________________</p>
-
-            {% for day, content in days.items() %}
-            <h2 class="slide-up">{{ day }} - {{ content.task }}</h2>
-            <p class="fade-in">Hausaufgaben-Check:</p>
-            <div class="task">
-                <label for="subject1-{{ day }}">Fach 1:</label>
-                <select id="subject1-{{ day }}" name="subject1-{{ day }}" required>
-                    <option value="">Bitte wählen</option>
-                    {% for subject in subjects %}
-                    <option value="{{ subject }}">{{ subject }}</option>
-                    {% endfor %}
-                </select>
-                <input type="text" name="material1-{{ day }}" placeholder="Benötigtes Material (z.B. Buch, Arbeitsheft)" value="{{ request.form.get('material1-' ~ day) }}">
-            </div>
-            <div class="task">
-                <label for="subject2-{{ day }}">Fach 2:</label>
-                <select id="subject2-{{ day }}" name="subject2-{{ day }}" required>
-                    <option value="">Bitte wählen</option>
-                    {% for subject in subjects %}
-                    <option value="{{ subject }}">{{ subject }}</option>
-                    {% endfor %}
-                </select>
-                <input type="text" name="material2-{{ day }}" placeholder="Benötigtes Material (z.B. Buch, Arbeitsheft)" value="{{ request.form.get('material2-' ~ day) }}">
-            </div>
-
-            <h3 class="fade-in">Heute lernen für:</h3>
-            <div class="learning-task">
-                <label for="learning-subject-{{ day }}">Fach:</label>
-                <select id="learning-subject-{{ day }}" name="learning-subject-{{ day }}" required>
-                    <option value="">Bitte wählen</option>
-                    {% for subject in subjects %}
-                    <option value="{{ subject }}">{{ subject }}</option>
-                    {% endfor %}
-                </select>
-
-                <label for="learning-task-{{ day }}">Aufgabe:</label>
-                <select id="learning-task-{{ day }}" name="learning-task-{{ day }}">
-                    <option value="">Bitte wählen</option>
-                    <option value="Test">Test</option>
-                    <option value="Diktat">Diktat</option>
-                    <option value="Vokabeln lernen">Vokabeln lernen</option>
-                    <option value="Praktikum vorbereiten">Praktikum vorbereiten</option>
-                    <option value="Experiment wiederholen">Experiment wiederholen</option>
-                    <option value="Essay schreiben">Essay schreiben</option>
-                    <option value="Projektarbeit">Projektarbeit</option>
-                    <option value="Präsentation üben">Präsentation üben</option>
-                </select>
-            </div>
-            <p class="tip fade-in">{{ content.tip }}</p>
-            {% endfor %}
-
-            <button type="submit">Speichern</button>
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center gradient-header p-3 rounded">
+            <h1 class="text-white">Wochenplan</h1>
+            <a href="{{ url_for('settings') }}" class="btn btn-light">Einstellungen</a>
         </div>
-    </form>
-        <a href="{{ url_for('download_pdf') }}" id="download" role="link">PDF herunterladen</a>
-    </main>
-
+        <ul class="nav nav-tabs" id="weekdaysTabs" role="tablist">
+            {% for day in days %}
+            <li class="nav-item" role="presentation">
+                <a class="nav-link {{ 'active' if loop.first else '' }}" id="{{ day }}-tab" data-bs-toggle="tab" href="#{{ day }}" role="tab" aria-controls="{{ day }}" aria-selected="{{ 'true' if loop.first else 'false' }}">{{ day }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+        <div class="tab-content" id="weekdaysContent">
+            {% for day, data in days.items() %}
+            <div class="tab-pane fade {{ 'show active' if loop.first else '' }}" id="{{ day }}" role="tabpanel" aria-labelledby="{{ day }}-tab">
+                <div class="card mt-3">
+                    <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapse{{ day }}" aria-expanded="true" aria-controls="collapse{{ day }}">
+                        <h5 class="mb-0">{{ day }}</h5>
+                    </div>
+                    <div id="collapse{{ day }}" class="collapse show">
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('home') }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="mb-3">
+                                    <label for="subject1-{{ day }}" class="form-label">Fach 1</label>
+                                    <input type="text" class="form-control" id="subject1-{{ day }}" name="subject1-{{ day }}" value="{{ data.subject1 }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="material1-{{ day }}" class="form-label">Material 1</label>
+                                    <input type="text" class="form-control" id="material1-{{ day }}" name="material1-{{ day }}" value="{{ data.material1 }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="subject2-{{ day }}" class="form-label">Fach 2</label>
+                                    <input type="text" class="form-control" id="subject2-{{ day }}" name="subject2-{{ day }}" value="{{ data.subject2 }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="material2-{{ day }}" class="form-label">Material 2</label>
+                                    <input type="text" class="form-control" id="material2-{{ day }}" name="material2-{{ day }}" value="{{ data.material2 }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="learning-subject-{{ day }}" class="form-label">Lernfach</label>
+                                    <input type="text" class="form-control" id="learning-subject-{{ day }}" name="learning-subject-{{ day }}" value="{{ data.learning_subject }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="learning-task-{{ day }}" class="form-label">Lernaufgabe</label>
+                                    <input type="text" class="form-control" id="learning-task-{{ day }}" name="learning-task-{{ day }}" value="{{ data.learning_task }}">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Speichern</button>
+                            </form>
+                            <div class="mt-3">
+                                <p><strong>Aufgabe:</strong> {{ data.task }}</p>
+                                <p><strong>Tipp:</strong> {{ data.tip }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
-                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                }, function(err) {
-                    console.log('ServiceWorker registration failed: ', err);
+        document.addEventListener('DOMContentLoaded', function() {
+            // GSAP animations for tab transitions
+            const tabs = document.querySelectorAll('.nav-link');
+            tabs.forEach(tab => {
+                tab.addEventListener('show.bs.tab', function(event) {
+                    gsap.fromTo(event.target, { opacity: 0 }, { opacity: 1, duration: 0.5 });
                 });
             });
-        }
 
-        // Lazy Loading
-        document.addEventListener('DOMContentLoaded', function() {
-            fetch('/api/week-data')
-                .then(response => response.json())
-                .then(data => {
-                    for (let day in data) {
-                        document.getElementById(`subject1-${day}`).value = data[day].subject1;
-                        document.getElementById(`subject2-${day}`).value = data[day].subject2;
-                        document.getElementById(`learning-subject-${day}`).value = data[day].learning_subject;
-                        document.getElementById(`learning-task-${day}`).value = data[day].learning_task;
-                        document.querySelector(`input[name="material1-${day}"]`).value = data[day].material1;
-                        document.querySelector(`input[name="material2-${day}"]`).value = data[day].material2;
-                    }
-                });
+            // Swipe gestures for mobile devices
+            let touchstartX = 0;
+            let touchendX = 0;
+            const tabsElement = document.getElementById('weekdaysTabs');
+
+            function handleGesture() {
+                if (touchendX < touchstartX) {
+                    const nextTab = document.querySelector('.nav-link.active').parentElement.nextElementSibling;
+                    if (nextTab) nextTab.querySelector('.nav-link').click();
+                }
+                if (touchendX > touchstartX) {
+                    const prevTab = document.querySelector('.nav-link.active').parentElement.previousElementSibling;
+                    if (prevTab) prevTab.querySelector('.nav-link').click();
+                }
+            }
+
+            tabsElement.addEventListener('touchstart', e => {
+                touchstartX = e.changedTouches[0].screenX;
+            });
+
+            tabsElement.addEventListener('touchend', e => {
+                touchendX = e.changedTouches[0].screenX;
+                handleGesture();
+            });
         });
-
-        // Initialize GSAP and ScrollTrigger animations
-document.addEventListener("DOMContentLoaded", () => {
-    gsap.from(".title", { duration: 1.2, y: -30, opacity: 0, ease: "power3.out" });
-    gsap.from(".card", { duration: 0.8, opacity: 0, stagger: 0.2, ease: "power2.out" });
-
-    // Button hover effect
-    const buttons = document.querySelectorAll("button");
-    buttons.forEach(button => {
-        button.addEventListener("mouseenter", () => {
-            gsap.to(button, { scale: 1.05, duration: 0.3 });
-        });
-        button.addEventListener("mouseleave", () => {
-            gsap.to(button, { scale: 1, duration: 0.3 });
-        });
-    });
-});
-
-        // Dark mode toggle with persistence
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            localStorage.setItem('dark-mode', document.body.classList.contains('dark-mode'));
-        }
-
-        // Load dark mode preference
-        if (localStorage.getItem('dark-mode') === 'true') {
-            document.body.classList.add('dark-mode');
-        }
     </script>
 </body>
 </html>
