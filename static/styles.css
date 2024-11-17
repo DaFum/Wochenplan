@@ -14,6 +14,11 @@
     --color-dark-background: #343a40;
     --color-dark-text: #f8f9fa;
     --color-muted: #6c757d;
+    --gradient-monday: linear-gradient(90deg, rgba(0,123,255,1) 0%, rgba(0,94,255,1) 50%, rgba(0,0,132,1) 100%);
+    --gradient-tuesday: linear-gradient(90deg, rgba(255,123,0,1) 0%, rgba(255,94,0,1) 50%, rgba(255,0,0,1) 100%);
+    --gradient-wednesday: linear-gradient(90deg, rgba(0,255,123,1) 0%, rgba(0,255,94,1) 50%, rgba(0,132,0,1) 100%);
+    --gradient-thursday: linear-gradient(90deg, rgba(123,0,255,1) 0%, rgba(94,0,255,1) 50%, rgba(0,0,255,1) 100%);
+    --gradient-friday: linear-gradient(90deg, rgba(255,0,123,1) 0%, rgba(255,0,94,1) 50%, rgba(132,0,0,1) 100%);
 }
 
 /* General Reset and Styling */
