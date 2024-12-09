@@ -1,0 +1,22 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Einstellungen</title>
+</head>
+<body>
+    <h1>Einstellungen</h1>
+    <h2>Fächer</h2>
+    <ul>
+        {% for subject in subjects %}
+        <li>{{ subject }}</li>
+        {% endfor %}
+    </ul>
+    <form method="post">
+        {{ csrf_token() }}
+        <input type="text" name="new_subject" placeholder="Neues Fach">
+        <button type="submit">Hinzufügen</button>
+    </form>
+</body>
+</html>

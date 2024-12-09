@@ -10,6 +10,8 @@ from dotenv import load_dotenv
 from weasyprint import HTML
 from datetime import datetime, timedelta
 from flask import send_from_directory
+from flask_migrate import Migrate
+from wtforms_sqlalchemy.fields import QuerySelectField
 
 load_dotenv()
 
@@ -20,22 +22,31 @@ csrf = CSRFProtect(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI', 'sqlite:///planner.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)  # Initialisiere Flask-Migrate
 
 # Konstanten für wiederholte Zeichenketten
 WEEKDAYS = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"]
-SUBJECTS = ["Mathe", "Deutsch", "Englisch", "Biologie", "Chemie", "Physik", "Geschichte", "Geografie", "Kunst", "Musik"]
 
-# Database model
+# Neues Datenbankmodell für Fächer
+class Subject(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+
+# Aktualisiertes PlannerEntry-Modell
 class PlannerEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     day = db.Column(db.String(20), nullable=False)
     week_start = db.Column(db.Date, nullable=False)
-    subject1 = db.Column(db.String(100), nullable=False)
+    subject1_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
     material1 = db.Column(db.String(100))
-    subject2 = db.Column(db.String(100), nullable=False)
+    subject2_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
     material2 = db.Column(db.String(100))
-    learning_subject = db.Column(db.String(100))
+    learning_subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
     learning_task = db.Column(db.String(100))
+
+    subject1 = db.relationship('Subject', foreign_keys=[subject1_id])
+    subject2 = db.relationship('Subject', foreign_keys=[subject2_id])
+    learning_subject = db.relationship('Subject', foreign_keys=[learning_subject_id])
 
     __table_args__ = (db.UniqueConstraint('day', 'week_start', name='_day_week_uc'),)
 
@@ -201,11 +212,11 @@ days_data = {
 
 # Flask-WTF form class
 class PlannerForm(FlaskForm):
-    subject1 = StringField('Fach 1', render_kw={"placeholder": "Fach 1"})
+    subject1 = QuerySelectField('Fach 1', query_factory=lambda: Subject.query.all(), get_label='name')
     material1 = StringField('Material 1', render_kw={"placeholder": "Material 1"})
-    subject2 = StringField('Fach 2', render_kw={"placeholder": "Fach 2"})
+    subject2 = QuerySelectField('Fach 2', query_factory=lambda: Subject.query.all(), get_label='name')
     material2 = StringField('Material 2', render_kw={"placeholder": "Material 2"})
-    learning_subject = StringField('Lernfach', render_kw={"placeholder": "Lernfach"})
+    learning_subject = QuerySelectField('Lernfach', query_factory=lambda: Subject.query.all(), get_label='name')
     learning_task = StringField('Lernaufgabe', render_kw={"placeholder": "Lernaufgabe"})
     submit = SubmitField('Speichern')
 
@@ -226,33 +237,23 @@ def get_week_start(date=None):
 # Home route
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    if request.method == 'POST':
+    form = PlannerForm()
+    if form.validate_on_submit():
         try:
             week_start = get_week_start()
             entries_to_update = []
             for day in WEEKDAYS:
-                form = PlannerForm(meta={'csrf': False})
-                form.subject1.data = request.form.get(f"subject1-{day}")
-                form.material1.data = request.form.get(f"material1-{day}")
-                form.subject2.data = request.form.get(f"subject2-{day}")
-                form.material2.data = request.form.get(f"material2-{day}")
-                form.learning_subject.data = request.form.get(f"learning-subject-{day}")
-                form.learning_task.data = request.form.get(f"learning-task-{day}")
-
-                if not all([form.subject1.data, form.subject2.data, form.learning_subject.data]):
-                    flash(f"Bitte fülle alle erforderlichen Felder für {day} aus.", "error")
-                    return redirect(url_for('home'))
-
                 entry = PlannerEntry.query.filter_by(day=day, week_start=week_start).first()
                 if entry:
+                    # Aktualisiere vorhandenen Eintrag
                     entry.subject1 = form.subject1.data
                     entry.material1 = form.material1.data
                     entry.subject2 = form.subject2.data
                     entry.material2 = form.material2.data
                     entry.learning_subject = form.learning_subject.data
                     entry.learning_task = form.learning_task.data
-                    entries_to_update.append(entry)
                 else:
+                    # Erstelle neuen Eintrag
                     new_entry = PlannerEntry(
                         day=day,
                         week_start=week_start,
@@ -264,11 +265,10 @@ def home():
                         learning_task=form.learning_task.data
                     )
                     db.session.add(new_entry)
-            
-            db.session.add_all(entries_to_update)
             db.session.commit()
             flash("Daten erfolgreich gespeichert!", "success")
         except Exception as e:
+            db.session.rollback()
             flash(f"Ein Fehler ist aufgetreten: {str(e)}", "error")
         return redirect(url_for('home'))
 
@@ -284,7 +284,7 @@ def home():
         } for day in WEEKDAYS
     }
 
-    return render_template('index.html', days=random_data, subjects=SUBJECTS)
+    return render_template('index.html', days=random_data, subjects=Subject.query.all(), form=form)
 
 @app.route('/manifest.json')
 def manifest():
@@ -295,11 +295,11 @@ def get_week_data():
     week_start = get_week_start()
     entries = PlannerEntry.query.filter_by(week_start=week_start).all()
     data = {entry.day: {
-        'subject1': entry.subject1,
+        'subject1': entry.subject1.name,
         'material1': entry.material1,
-        'subject2': entry.subject2,
+        'subject2': entry.subject2.name,
         'material2': entry.material2,
-        'learning_subject': entry.learning_subject,
+        'learning_subject': entry.learning_subject.name,
         'learning_task': entry.learning_task
     } for entry in entries}
     return jsonify(data)
@@ -310,14 +310,7 @@ def download_pdf():
     week_start = get_week_start()
     entries = PlannerEntry.query.filter_by(week_start=week_start).all()
     
-    pdf_content = "<html><body>"
-    for entry in entries:
-        pdf_content += f"<h2>{entry.day}</h2>"
-        pdf_content += f"<p>Fach 1: {entry.subject1} - Material: {entry.material1}</p>"
-        pdf_content += f"<p>Fach 2: {entry.subject2} - Material: {entry.material2}</p>"
-        pdf_content += f"<p>Lernfach: {entry.learning_subject} - Aufgabe: {entry.learning_task}</p>"
-    pdf_content += "</body></html>"
-
+    pdf_content = render_template('pdf_template.html', entries=entries)
     pdf_file = HTML(string=pdf_content).write_pdf()
 
     return send_file(
@@ -330,14 +323,19 @@ def download_pdf():
 @app.route('/einstellungen', methods=['GET', 'POST'])
 def settings():
     if request.method == 'POST':
-        # Prozess zur Verwaltung benutzerdefinierter Fächer
         new_subject = request.form.get('new_subject')
-        if new_subject and new_subject not in SUBJECTS:
-            SUBJECTS.append(new_subject)
-            flash("Neues Fach erfolgreich hinzugefügt!", "success")
+        if new_subject:
+            existing_subject = Subject.query.filter_by(name=new_subject).first()
+            if not existing_subject:
+                subject = Subject(name=new_subject)
+                db.session.add(subject)
+                db.session.commit()
+                flash("Neues Fach erfolgreich hinzugefügt!", "success")
+            else:
+                flash("Das Fach existiert bereits.", "error")
         return redirect(url_for('settings'))
-    
-    return render_template('settings.html', subjects=SUBJECTS)
+    subjects = Subject.query.all()
+    return render_template('settings.html', subjects=subjects)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))

@@ -20,6 +20,13 @@
         .gradient-header {
             background: linear-gradient(90deg, rgba(255,153,102,1) 0%, rgba(255,94,98,1) 50%, rgba(255,0,132,1) 100%);
         }
+        body.dark-mode {
+            background-color: #343a40;
+            color: #f8f9fa;
+        }
+        .dark-mode .card {
+            background-color: #495057;
+        }
     </style>
 </head>
 <body>
@@ -28,6 +35,8 @@
             <h1 class="text-white">Wochenplan</h1>
             <a href="{{ url_for('settings') }}" class="btn btn-light">Einstellungen</a>
         </div>
+        <button id="darkModeToggle" class="btn btn-secondary">Dunkelmodus umschalten</button>
+        <input type="text" id="searchInput" class="form-control mt-3" placeholder="Suche nach Fach oder Material">
         <ul class="nav nav-tabs" id="weekdaysTabs" role="tablist">
             {% for day in days %}
             <li class="nav-item" role="presentation">
@@ -43,7 +52,7 @@
                         <h5 class="mb-0">{{ day }}</h5>
                     </div>
                     <div id="collapse{{ day }}" class="collapse show">
-                        <div class="card-body">
+                        <div class="card-body search-item">
                             <form method="POST" action="{{ url_for('home') }}">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <div class="mb-3">
@@ -117,6 +126,27 @@
             tabsElement.addEventListener('touchend', e => {
                 touchendX = e.changedTouches[0].screenX;
                 handleGesture();
+            });
+
+            // Dunkelmodus umschalten
+            document.getElementById('darkModeToggle').addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+            });
+
+            // Formular-Bestätigungsmeldung
+            document.querySelectorAll('form').forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    alert('Änderungen erfolgreich gespeichert.');
+                });
+            });
+
+            // Suchfunktion für Fächer und Materialien
+            document.getElementById('searchInput').addEventListener('keyup', function() {
+                let filter = this.value.toLowerCase();
+                document.querySelectorAll('.search-item').forEach(function(item) {
+                    let text = item.textContent.toLowerCase();
+                    item.style.display = text.includes(filter) ? '' : 'none';
+                });
             });
         });
     </script>
