@@ -13,8 +13,13 @@ main_bp = Blueprint('main', __name__)
 WEEKDAYS = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"]
 
 def load_days_data():
-    with open('config/weekday_data.json', 'r', encoding='utf-8') as f:
-        return json.load(f)
+    try:
+        with open('config/weekday_data.json', 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        # Log the error and return a default structure
+        print(f"Fehler beim Laden der Wochentage-Daten: {e}")
+        return {day: {"tasks": [], "tips": []} for day in WEEKDAYS}
 
 days_data = load_days_data()
 
