@@ -1,19 +1,43 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <title>Wochenplan</title>
     <style>
-        /* Fügen Sie hier entsprechende Styles hinzu */
+        body { font-family: sans-serif; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f2f2f2; }
     </style>
 </head>
 <body>
-    {% for entry in entries %}
-    <h2>{{ entry.day }}</h2>
-    <p>Fach 1: {{ entry.subject1.name }} - Material: {{ entry.material1 }}</p>
-    <p>Fach 2: {{ entry.subject2.name }} - Material: {{ entry.material2 }}</p>
-    <p>Lernfach: {{ entry.learning_subject.name }} - Aufgabe: {{ entry.learning_task }}</p>
-    {% endfor %}
+    <h1>Wochenplan</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Tag</th>
+                <th>Fach 1</th>
+                <th>Material 1</th>
+                <th>Fach 2</th>
+                <th>Material 2</th>
+                <th>Lernfach</th>
+                <th>Lernaufgabe</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in entries %}
+            <tr>
+                <td>{{ entry.day }}</td>
+                <td>{{ entry.subject1.name }}</td>
+                <td>{{ entry.material1 }}</td>
+                <td>{{ entry.subject2.name }}</td>
+                <td>{{ entry.material2 }}</td>
+                <td>{{ entry.learning_subject.name }}</td>
+                <td>{{ entry.learning_task }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>
