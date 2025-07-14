@@ -14,12 +14,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function handleGesture() {
         if (touchendX < touchstartX) {
-            const nextTab = document.querySelector('.nav-link.active').parentElement.nextElementSibling;
-            if (nextTab) nextTab.querySelector('.nav-link').click();
+        const activeTab = document.querySelector('.nav-link.active');
+        if (activeTab) {
+            const nextTab = activeTab.parentElement.nextElementSibling;
+            if (nextTab && nextTab.querySelector('.nav-link')) {
+                nextTab.querySelector('.nav-link').click();
+            }
+        }
         }
         if (touchendX > touchstartX) {
-            const prevTab = document.querySelector('.nav-link.active').parentElement.previousElementSibling;
-            if (prevTab) prevTab.querySelector('.nav-link').click();
+        const activeTab = document.querySelector('.nav-link.active');
+        if (activeTab) {
+            const prevTab = activeTab.parentElement.previousElementSibling;
+            if (prevTab && prevTab.querySelector('.nav-link')) {
+                prevTab.querySelector('.nav-link').click();
+            }
+        }
         }
     }
 

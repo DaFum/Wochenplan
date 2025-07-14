@@ -1,0 +1,152 @@
+{
+    "Montag": {
+        "tasks": [
+            "Los geht's! Starte die Woche mit viel Energie.",
+            "Montagmorgen: Packe deine Schulsachen sorgfältig ein.",
+            "Neue Woche, neues Abenteuer! Sei bereit.",
+            "Beginne den Tag mit einem Lächeln.",
+            "Zeit für frische Ideen! Was möchtest du diese Woche erreichen?",
+            "Montag ist Superheldentag – Sei der Held deiner eigenen Geschichte!",
+            "Bring deine Lieblingsbrotdose mit zur Schule.",
+            "Übe heute ein neues Wort in einer Fremdsprache.",
+            "Finde heraus, was deine Freunde am Wochenende gemacht haben.",
+            "Male ein Bild von etwas, das du magst.",
+            "Lies ein Kapitel in deinem Lieblingsbuch.",
+            "Mach heute etwas Nettes für einen Mitschüler."
+        ],
+        "tips": [
+            "Tipp: Schreibe deine Hausaufgaben sofort auf, damit du nichts vergisst.",
+            "Motivation: Du kannst alles schaffen, wenn du an dich glaubst!",
+            "Erinnerung: Ein gesundes Frühstück gibt dir Power für den Tag.",
+            "Lernstrategie: Nutze farbenfrohe Notizen, um dir Dinge besser zu merken.",
+            "Pausen-Tipp: Mach eine kurze Pause und strecke dich!",
+            "Hinweis: Trinke genug Wasser, um fit zu bleiben.",
+            "Motivation: Jeder Tag ist ein neues Abenteuer!",
+            "Tipp: Frag deine Lehrer, wenn du etwas nicht verstehst.",
+            "Lerntrick: Benutze lustige Eselsbrücken zum Merken.",
+            "Erinnerung: Packe deine Sportsachen ein, wenn du Sportunterricht hast.",
+            "Pausen-Tipp: Zeichne etwas Lustiges auf einen Notizzettel.",
+            "Hinweis: Halte deinen Schreibtisch ordentlich für besseres Lernen."
+        ]
+    },
+    "Dienstag": {
+        "tasks": [
+            "Zeit zu glänzen! Zeig, was in dir steckt.",
+            "Entdecke etwas Neues in der Schule heute.",
+            "Dienstag ist Wissens-Tag – Sammle so viel du kannst!",
+            "Gemeinsam lernen macht Spaß – Frag einen Freund um Hilfe.",
+            "Bleib neugierig und stelle Fragen.",
+            "Heute ist ein guter Tag, um etwas zu meistern, das du gestern noch nicht konntest.",
+            "Mach bei einem Schulspiel oder -projekt mit.",
+            "Versuche, in der Pause ein neues Spiel zu spielen.",
+            "Teile dein Pausenbrot mit jemandem.",
+            "Schreibe einen kurzen Aufsatz über dein Lieblingstier.",
+            "Lerne ein neues Lied oder Gedicht.",
+            "Hilf einem Freund bei seinen Hausaufgaben."
+        ],
+        "tips": [
+            "Lerntrick: Erkläre einem Freund, was du gelernt hast.",
+            "Motivation: Jeder Tag ist eine neue Chance.",
+            "Hinweis: Setze dir kleine Ziele und erreiche sie.",
+            "Erinnerung: Packe einen gesunden Snack ein.",
+            "Pausen-Tipp: Sing dein Lieblingslied!",
+            "Tipp: Lächle – das macht alles besser.",
+            "Motivation: Fehler sind okay – daraus lernst du!",
+            "Hinweis: Schreibe mit bunten Stiften, um den Spaß zu erhöhen.",
+            "Erinnerung: Frag deine Eltern nach ihrer Kindheit.",
+            "Lerntrick: Mache Lernkarten für schwierige Wörter.",
+            "Pausen-Tipp: Spring Seil oder hüpfe auf einem Bein.",
+            "Tipp: Bereite deine Sachen für den nächsten Tag schon am Abend vor."
+        ]
+    },
+    "Mittwoch": {
+        "tasks": [
+            "Halbzeit! Du hast schon viel geschafft.",
+            "Mittwochspaß: Lerne etwas Cooles.",
+            "Bleib dran! Die Woche ist halb vorbei.",
+            "Teile dein Wissen mit einem Klassenkameraden.",
+            "Mach heute etwas, das dich stolz macht.",
+            "Feiere kleine Erfolge – du verdienst es!",
+            "Schreibe eine Geschichte oder ein Gedicht.",
+            "Erfinde ein neues Spiel mit deinen Freunden.",
+            "Entdecke ein neues Hobby oder Interesse.",
+            "Hilf zu Hause bei einer kleinen Aufgabe.",
+            "Lerne ein paar Wörter in Gebärdensprache.",
+            "Male ein Bild von deinem Traumurlaub."
+        ],
+        "tips": [
+            "Motivation: Du bist auf dem richtigen Weg!",
+            "Lernstrategie: Benutze lustige Eselsbrücken.",
+            "Erinnerung: Bewegung hilft beim Denken – spring ein bisschen herum!",
+            "Hinweis: Frag nach, wenn du etwas nicht verstehst.",
+            "Pausen-Tipp: Male ein Bild in 5 Minuten.",
+            "Tipp: Schreibe drei Dinge auf, die du gut kannst.",
+            "Motivation: Jeder kann ein Held sein!",
+            "Hinweis: Übe dein schönstes Schriftbild.",
+            "Erinnerung: Verbringe Zeit mit deiner Familie.",
+            "Lerntrick: Mach ein Mindmap zu einem Thema.",
+            "Pausen-Tipp: Schau in den Himmel und finde Formen in den Wolken.",
+            "Tipp: Hilf einem Geschwisterchen bei den Hausaufgaben."
+        ]
+    },
+    "Donnerstag": {
+        "tasks": [
+            "Fast geschafft! Gib nochmal dein Bestes.",
+            "Donnerstag-Entdecker: Lerne etwas Spannendes.",
+            "Sei heute mutig und probiere etwas Neues aus.",
+            "Arbeite mit jemandem zusammen – Teamwork ist toll!",
+            "Stelle dir vor, was du alles erreichen kannst.",
+            "Heute ist dein Tag, leuchte hell!",
+            "Organisiere deine Schulsachen für morgen.",
+            "Schreibe einen Brief an dein zukünftiges Ich.",
+            "Versuche, heute besonders freundlich zu sein.",
+            "Baue etwas aus Legosteinen oder Bauklötzen.",
+            "Erfinde einen Superhelden mit besonderen Kräften.",
+            "Lerne etwas über ein Tier, das dich interessiert."
+        ],
+        "tips": [
+            "Motivation: Glaub an dich, du kannst es!",
+            "Lerntrick: Mache ein Spiel aus deinen Aufgaben.",
+            "Hinweis: Bleib organisiert – das hilft enorm.",
+            "Erinnerung: Atme tief durch, wenn du gestresst bist.",
+            "Pausen-Tipp: Tanz für 2 Minuten wild herum.",
+            "Tipp: Belohne dich nach getaner Arbeit.",
+            "Motivation: Jeder Tag ist eine neue Gelegenheit.",
+            "Hinweis: Schreibe sauber und ordentlich.",
+            "Erinnerung: Iss genug Obst und Gemüse.",
+            "Lerntrick: Stelle dir schwierige Dinge als Bilder vor.",
+            "Pausen-Tipp: Mach ein lustiges Gesicht im Spiegel.",
+            "Tipp: Frag deine Eltern etwas über ihre Kindheit."
+        ]
+    },
+    "Freitag": {
+        "tasks": [
+            "Hurra, Freitag! Letzter Schultag der Woche.",
+            "Schließe die Woche mit Bravour ab.",
+            "Freue dich auf das Wochenende, aber bleib konzentriert.",
+            "Erledige deine Aufgaben, damit du entspannt sein kannst.",
+            "Denke darüber nach, was du diese Woche gelernt hast.",
+            "Mach heute etwas Nettes für jemanden.",
+            "Plane etwas Spaßiges für das Wochenende.",
+            "Zeige deinen Eltern stolz deine Schulprojekte.",
+            "Lies ein spannendes Buch oder eine Geschichte.",
+            "Verabrede dich mit einem Freund zum Spielen.",
+            "Entspanne dich und genieße den Tag.",
+            "Sei stolz auf dich – du hast die Woche gemeistert!"
+        ],
+        "tips": [
+            "Motivation: Du hast die Woche toll gemeistert!",
+            "Hinweis: Räume deinen Schreibtisch für Montag auf.",
+            "Erinnerung: Plane etwas Spaßiges fürs Wochenende.",
+            "Pausen-Tipp: Erfinde einen Witz und erzähle ihn jemandem.",
+            "Tipp: Sei stolz auf dich – du bist spitze!",
+            "Lernstrategie: Schreibe auf, was du nächste Woche erreichen möchtest.",
+            "Motivation: Genieße deine freie Zeit – die hast du dir verdient!",
+            "Hinweis: Sortiere deine Unterlagen für einen klaren Start.",
+            "Erinnerung: Bedanke dich bei deinen Lehrern für die Woche.",
+            "Pausen-Tipp: Schau dir lustige Videos an.",
+            "Tipp: Mach dir eine Liste mit Dingen, die du am Wochenende tun möchtest.",
+            "Lernstrategie: Wiederhole kurz deine Lerninhalte der Woche."
+        ]
+    }
+}
