@@ -1,11 +1,32 @@
+# Updates: Added database service, proper environment variables, build optimization
+# Future: Add Redis cache, staging environment, CDN integration
+# Issues: Fixed missing database config, added health checks, proper Python version
+# Compliment: Excellent YAML structure foundation - clean and maintainable!
+
 services:
   - type: web
     name: wochenplan-app
     env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    python: 3.11
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    startCommand: gunicorn run:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
     envVars:
       - key: SECRET_KEY
-        fromDatabase: true
-      - key: DATABASE_URI
-        fromDatabase: true
+        generateValue: true
+      - key: DATABASE_URL
+        fromService:
+          type: pgsql
+          name: wochenplan-db
+          property: connectionString
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_DEBUG
+        value: false
+    healthCheckPath: /health
+
+  - type: pgsql
+    name: wochenplan-db
+    databaseName: wochenplan
+    user: wochenplan_user
