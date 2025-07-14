@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Einstellungen</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center gradient-header p-3 rounded">
+            <h1 class="text-white">Einstellungen</h1>
+            <a href="{{ url_for('main.home') }}" class="btn btn-light">Zurück zum Wochenplan</a>
+        </div>
+        <div class="card mt-3">
+            <div class="card-body">
+                <h2>Fächer</h2>
+                <ul class="list-group mb-3">
+                    {% for subject in subjects %}
+                    <li class="list-group-item">{{ subject.name }}</li>
+                    {% endfor %}
+                </ul>
+                <form method="post" action="{{ url_for('main.settings') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="new_subject" class="form-label">Neues Fach</label>
+                        <input type="text" id="new_subject" name="new_subject" class="form-control" placeholder="Neues Fach">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Hinzufügen</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

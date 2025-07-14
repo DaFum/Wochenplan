@@ -1,62 +1,16 @@
-from flask import Flask, render_template, request, redirect, url_for, send_file, session, flash, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from flask_wtf.csrf import CSRFProtect
-import random
-import os
-import io
-from dotenv import load_dotenv
-from weasyprint import HTML
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, send_file
+from app import db
+from app.models import PlannerEntry, Subject
+from .forms import PlannerForm
 from datetime import datetime, timedelta
-from flask import send_from_directory
-from flask_migrate import Migrate
-from wtforms_sqlalchemy.fields import QuerySelectField
+import random
+import io
+from weasyprint import HTML
 
-load_dotenv()
+main_bp = Blueprint('main', __name__)
 
-app = Flask(__name__)
-app.secret_key = os.getenv('SECRET_KEY', 'your-default-secret-key')
-csrf = CSRFProtect(app)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI', 'sqlite:///planner.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)  # Initialisiere Flask-Migrate
-
-# Konstanten für wiederholte Zeichenketten
 WEEKDAYS = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"]
 
-# Neues Datenbankmodell für Fächer
-class Subject(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), unique=True, nullable=False)
-
-# Aktualisiertes PlannerEntry-Modell
-class PlannerEntry(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    day = db.Column(db.String(20), nullable=False)
-    week_start = db.Column(db.Date, nullable=False)
-    subject1_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
-    material1 = db.Column(db.String(100))
-    subject2_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
-    material2 = db.Column(db.String(100))
-    learning_subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
-    learning_task = db.Column(db.String(100))
-
-    subject1 = db.relationship('Subject', foreign_keys=[subject1_id])
-    subject2 = db.relationship('Subject', foreign_keys=[subject2_id])
-    learning_subject = db.relationship('Subject', foreign_keys=[learning_subject_id])
-
-    __table_args__ = (db.UniqueConstraint('day', 'week_start', name='_day_week_uc'),)
-
-# Create the database within the app context
-with app.app_context():
-    db.create_all()
-    db.Index('idx_week_start', PlannerEntry.week_start)
-    db.Index('idx_day', PlannerEntry.day)
-
-# Weekdays with specific text content
 days_data = {
     "Montag": {
         "tasks": [
@@ -210,16 +164,6 @@ days_data = {
      }
 }
 
-# Flask-WTF form class
-class PlannerForm(FlaskForm):
-    subject1 = QuerySelectField('Fach 1', query_factory=lambda: Subject.query.all(), get_label='name')
-    material1 = StringField('Material 1', render_kw={"placeholder": "Material 1"})
-    subject2 = QuerySelectField('Fach 2', query_factory=lambda: Subject.query.all(), get_label='name')
-    material2 = StringField('Material 2', render_kw={"placeholder": "Material 2"})
-    learning_subject = QuerySelectField('Lernfach', query_factory=lambda: Subject.query.all(), get_label='name')
-    learning_task = StringField('Lernaufgabe', render_kw={"placeholder": "Lernaufgabe"})
-    submit = SubmitField('Speichern')
-
 def get_random_item(items, used_items):
     unused_items = list(set(items) - set(used_items))
     if not unused_items:
@@ -234,18 +178,15 @@ def get_week_start(date=None):
         date = datetime.now()
     return date - timedelta(days=date.weekday())
 
-# Home route
-@app.route('/', methods=['GET', 'POST'])
+@main_bp.route('/', methods=['GET', 'POST'])
 def home():
     form = PlannerForm()
     if form.validate_on_submit():
         try:
             week_start = get_week_start()
-            entries_to_update = []
             for day in WEEKDAYS:
                 entry = PlannerEntry.query.filter_by(day=day, week_start=week_start).first()
                 if entry:
-                    # Aktualisiere vorhandenen Eintrag
                     entry.subject1 = form.subject1.data
                     entry.material1 = form.material1.data
                     entry.subject2 = form.subject2.data
@@ -253,7 +194,6 @@ def home():
                     entry.learning_subject = form.learning_subject.data
                     entry.learning_task = form.learning_task.data
                 else:
-                    # Erstelle neuen Eintrag
                     new_entry = PlannerEntry(
                         day=day,
                         week_start=week_start,
@@ -270,7 +210,7 @@ def home():
         except Exception as e:
             db.session.rollback()
             flash(f"Ein Fehler ist aufgetreten: {str(e)}", "error")
-        return redirect(url_for('home'))
+        return redirect(url_for('main.home'))
 
     if 'tasks_used' not in session:
         session['tasks_used'] = {day: [] for day in WEEKDAYS}
@@ -286,11 +226,7 @@ def home():
 
     return render_template('index.html', days=random_data, subjects=Subject.query.all(), form=form)
 
-@app.route('/manifest.json')
-def manifest():
-    return send_from_directory('static', 'manifest.json')
-
-@app.route('/api/week-data')
+@main_bp.route('/api/week-data')
 def get_week_data():
     week_start = get_week_start()
     entries = PlannerEntry.query.filter_by(week_start=week_start).all()
@@ -304,8 +240,7 @@ def get_week_data():
     } for entry in entries}
     return jsonify(data)
 
-# PDF download route
-@app.route('/download-pdf')
+@main_bp.route('/download-pdf')
 def download_pdf():
     week_start = get_week_start()
     entries = PlannerEntry.query.filter_by(week_start=week_start).all()
@@ -320,7 +255,7 @@ def download_pdf():
         mimetype='application/pdf'
     )
 
-@app.route('/einstellungen', methods=['GET', 'POST'])
+@main_bp.route('/einstellungen', methods=['GET', 'POST'])
 def settings():
     if request.method == 'POST':
         new_subject = request.form.get('new_subject')
@@ -333,10 +268,6 @@ def settings():
                 flash("Neues Fach erfolgreich hinzugefügt!", "success")
             else:
                 flash("Das Fach existiert bereits.", "error")
-        return redirect(url_for('settings'))
+        return redirect(url_for('main.settings'))
     subjects = Subject.query.all()
     return render_template('settings.html', subjects=subjects)
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
