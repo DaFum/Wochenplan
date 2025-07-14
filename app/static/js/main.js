@@ -12,26 +12,18 @@ document.addEventListener('DOMContentLoaded', function() {
     let touchendX = 0;
     const tabsElement = document.getElementById('weekdaysTabs');
 
-    function handleGesture() {
-        if (touchendX < touchstartX) {
-        const activeTab = document.querySelector('.nav-link.active');
-        if (activeTab) {
-            const nextTab = activeTab.parentElement.nextElementSibling;
-            if (nextTab && nextTab.querySelector('.nav-link')) {
-                nextTab.querySelector('.nav-link').click();
-            }
-        }
-        }
-        if (touchendX > touchstartX) {
-        const activeTab = document.querySelector('.nav-link.active');
-        if (activeTab) {
-            const prevTab = activeTab.parentElement.previousElementSibling;
-            if (prevTab && prevTab.querySelector('.nav-link')) {
-                prevTab.querySelector('.nav-link').click();
-            }
-        }
-        }
-    }
+ function handleGesture() {
+     if (touchendX < touchstartX) {
+         const activeTab = document.querySelector('.nav-link.active');
+         const nextTab = activeTab?.parentElement?.nextElementSibling;
+         nextTab?.querySelector('.nav-link')?.click();
+     }
+     if (touchendX > touchstartX) {
+         const activeTab = document.querySelector('.nav-link.active');
+         const prevTab = activeTab?.parentElement?.previousElementSibling;
+         prevTab?.querySelector('.nav-link')?.click();
+     }
+ }
 
     if (tabsElement) {
         tabsElement.addEventListener('touchstart', e => {
