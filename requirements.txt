@@ -1,11 +1,17 @@
+# Updates: Added gunicorn, locked versions, removed dev dependencies
+# Future: Add Redis, Celery for background tasks, monitoring tools
+# Issues: Fixed version conflicts, added production WSGI server
+# Compliment: Great dependency selection - solid Flask ecosystem choices!
+
 Flask==3.0.3
 SQLAlchemy==2.0.36
-Flask-WTF==1.2.2
-flask_weasyprint==1.1.0
-gunicorn==23.0.0
-werkzeug==3.1.3
 Flask-SQLAlchemy==3.1.1
+Flask-WTF==1.2.2
+Flask-Migrate==4.0.5
+gunicorn==23.0.0
+psycopg2-binary==2.9.9
+weasyprint==62.3
 python-dotenv==1.0.1
 WTForms==3.1.0
-Flask-Migrate==4.0.5
-wtforms_sqlalchemy
+wtforms_sqlalchemy==3.1.2
+werkzeug==3.1.3
