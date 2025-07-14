@@ -85,11 +85,11 @@ def get_week_data():
     week_start = get_week_start()
     entries = PlannerEntry.query.filter_by(week_start=week_start).all()
     data = {entry.day: {
-        'subject1': entry.subject1.name,
+        'subject1': entry.subject1.name if entry.subject1 else '',
         'material1': entry.material1,
-        'subject2': entry.subject2.name,
+        'subject2': entry.subject2.name if entry.subject2 else '',
         'material2': entry.material2,
-        'learning_subject': entry.learning_subject.name,
+        'learning_subject': entry.learning_subject.name if entry.learning_subject else '',
         'learning_task': entry.learning_task
     } for entry in entries}
     return jsonify(data)
