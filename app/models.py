@@ -19,4 +19,6 @@ class PlannerEntry(db.Model):
     subject2 = db.relationship('Subject', foreign_keys=[subject2_id])
     learning_subject = db.relationship('Subject', foreign_keys=[learning_subject_id])
 
-    __table_args__ = (db.UniqueConstraint('day', 'week_start', name='_day_week_uc'),)
+    __table_args__ = (db.UniqueConstraint('day', 'week_start', name='_day_week_uc'),
+                      db.Index('idx_week_start', week_start),
+                      db.Index('idx_day', day))
