@@ -13,12 +13,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const tabsElement = document.getElementById('weekdaysTabs');
 
  function handleGesture() {
-     if (touchendX < touchstartX) {
+     const swipeThreshold = 50; // Minimum pixels for a swipe
+     if (touchendX < touchstartX - swipeThreshold) {
          const activeTab = document.querySelector('.nav-link.active');
          const nextTab = activeTab?.parentElement?.nextElementSibling;
          nextTab?.querySelector('.nav-link')?.click();
      }
-     if (touchendX > touchstartX) {
+     if (touchendX > touchstartX + swipeThreshold) {
          const activeTab = document.querySelector('.nav-link.active');
          const prevTab = activeTab?.parentElement?.previousElementSibling;
          prevTab?.querySelector('.nav-link')?.click();
