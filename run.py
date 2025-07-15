@@ -5,7 +5,8 @@
 
 import os
 import logging
-from app import create_app
+from app import create_app, db
+from flask_migrate import Migrate
 
 # Configure logging for production
 logging.basicConfig(
@@ -14,6 +15,11 @@ logging.basicConfig(
 )
 
 app = create_app()
+migrate = Migrate(app, db)
+
+@app.before_request
+def before_request():
+    db.create_all()
 
 # Add health check endpoint for Render
 @app.route('/health')
