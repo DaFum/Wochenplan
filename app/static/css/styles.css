@@ -98,8 +98,8 @@ body {
 }
 
 .btn-primary:hover {
-    background-color: #004494;
-    border-color: #004494;
+background-color: var(--color-primary-darker);
+border-color: var(--color-primary-darker);
 }
 
 /* Title Styling */
