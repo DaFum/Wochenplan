@@ -1,41 +1,60 @@
-/* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@300;500;700&display=swap');
-
 /* Root Variables */
 :root {
-    --color-background: #f0f2f5;
-    --color-text: #212529;
-    --color-primary: #007bff;
+    --color-background: #f8f9fa;
+    --color-text: #000000;
+    --color-primary: #0056b3;
     --color-secondary: #6c757d;
     --color-accent: #17a2b8;
-    --color-border: #ced4da;
+    --color-border: #dee2e6;
     --color-highlight: #e9ecef;
     --color-light: #ffffff;
-    --color-dark-background: #343a40;
+    --color-dark-background: #212529;
     --color-dark-text: #f8f9fa;
     --color-muted: #6c757d;
-    --gradient-monday: linear-gradient(90deg, rgba(0,123,255,1) 0%, rgba(0,94,255,1) 50%, rgba(0,0,132,1) 100%);
-    --gradient-tuesday: linear-gradient(90deg, rgba(255,123,0,1) 0%, rgba(255,94,0,1) 50%, rgba(255,0,0,1) 100%);
-    --gradient-wednesday: linear-gradient(90deg, rgba(0,255,123,1) 0%, rgba(0,255,94,1) 50%, rgba(0,132,0,1) 100%);
-    --gradient-thursday: linear-gradient(90deg, rgba(123,0,255,1) 0%, rgba(94,0,255,1) 50%, rgba(0,0,255,1) 100%);
-    --gradient-friday: linear-gradient(90deg, rgba(255,0,123,1) 0%, rgba(255,0,94,1) 50%, rgba(132,0,0,1) 100%);
+}
+
+.header {
+    background-color: var(--color-primary);
+    color: var(--color-light);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+.header .btn {
+    background-color: var(--color-light);
+    color: var(--color-primary);
+    border: none;
+}
+
+.header .btn:hover {
+    background-color: var(--color-highlight);
 }
 
 /* General Reset and Styling */
-* {
+html {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Roboto', 'Montserrat', sans-serif;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
 }
 
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     background-color: var(--color-background);
     color: var(--color-text);
     line-height: 1.6;
-    font-size: 16px;
-    padding: 20px;
+    font-size: 1rem;
+    padding: 1rem;
     margin: 0;
     transition: background-color 0.3s, color 0.3s;
 }
@@ -71,6 +90,16 @@ body {
 
 .nav-list a:hover {
     color: #ffcc00;
+}
+
+.nav-tabs .nav-link:hover {
+    background-color: var(--color-highlight);
+    border-color: var(--color-highlight);
+}
+
+.btn-primary:hover {
+background-color: var(--color-primary-darker);
+border-color: var(--color-primary-darker);
 }
 
 /* Title Styling */
@@ -134,24 +163,24 @@ body {
     margin-bottom: 5px;
 }
 
-.task select, .task input, .learning-task select, .learning-task input {
+.custom-form-control {
     width: 100%;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 0.75rem 1rem;
+    border-radius: 0.25rem;
     border: 1px solid var(--color-border);
     outline: none;
-    font-size: 1em;
-    margin-bottom: 12px;
+    font-size: 1rem;
+    margin-bottom: 1rem;
     transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-.task select:hover, .task input:hover, .learning-task select:hover, .learning-task input:hover {
+.form-control:hover {
     border-color: var(--color-accent);
 }
 
-.task select:focus, .task input:focus, .learning-task select:focus, .learning-task input:focus {
+.form-control:focus {
     border-color: var(--color-primary);
-    box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+    box-shadow: 0 0 0 0.25rem rgba(0, 86, 179, 0.25);
 }
 
 /* Button Styling */
@@ -225,44 +254,66 @@ body.dark-mode {
     color: var(--color-dark-text);
 }
 
+body.dark-mode .header {
+    background-color: #1a1a1a;
+}
+
 body.dark-mode .planner {
-    background-color: #1e1e1e;
-    color: var(--color-dark-text);
-    border-color: var(--color-muted);
-    box-shadow: none;
+    background-color: var(--color-dark-background);
+    border-color: #444;
 }
 
 body.dark-mode .card {
     background-color: #2c2c2c;
-    box-shadow: 0 1px 5px rgba(255, 255, 255, 0.1);
+    border-color: #444;
 }
 
 body.dark-mode .task, body.dark-mode .learning-task {
-    background-color: #495057;
-    border-color: var(--color-muted);
+    background-color: #3a3a3a;
+    border-color: #555;
 }
 
-body.dark-mode .task label, body.dark-mode .learning-task label {
+body.dark-mode .form-control {
+    background-color: #3a3a3a;
     color: var(--color-dark-text);
+    border-color: #555;
 }
 
-body.dark-mode .task select, .task input, .learning-task select, .learning-task input {
-    background-color: var(--color-dark-background);
+body.dark-mode .form-control:focus {
+    background-color: #3a3a3a;
     color: var(--color-dark-text);
-    border-color: var(--color-muted);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 0.25rem rgba(0, 86, 179, 0.5);
 }
 
-body.dark-mode button {
-    background-color: var(--color-accent);
-}
-
-body.dark-mode button:hover {
+body.dark-mode .btn-primary {
     background-color: var(--color-primary);
-    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+    border-color: var(--color-primary);
 }
 
-body.dark-mode a {
-    color: var(--color-accent);
+body.dark-mode .btn-primary:hover {
+    background-color: #004494;
+    border-color: #004494;
+}
+
+body.dark-mode .btn-secondary {
+    background-color: var(--color-secondary);
+    border-color: var(--color-secondary);
+}
+
+body.dark-mode .btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #5a6268;
+}
+
+body.dark-mode .nav-tabs .nav-link {
+    color: var(--color-dark-text);
+    border-color: #444;
+}
+
+body.dark-mode .nav-tabs .nav-link.active {
+    background-color: #2c2c2c;
+    border-color: #444;
 }
 
 /* Dark Mode Toggle Button */

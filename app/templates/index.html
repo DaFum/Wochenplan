@@ -10,9 +10,9 @@
 </head>
 <body>
     <div class="container mt-5">
-        <div class="d-flex justify-content-between align-items-center gradient-header p-3 rounded">
-            <h1 class="text-white">Wochenplan</h1>
-            <a href="{{ url_for('main.settings') }}" class="btn btn-light">Einstellungen</a>
+        <div class="header">
+            <h1>Wochenplan</h1>
+            <a href="{{ url_for('main.settings') }}" class="btn">Einstellungen</a>
         </div>
         <button id="darkModeToggle" class="btn btn-secondary mt-3">Dunkelmodus umschalten</button>
         <input type="text" id="searchInput" class="form-control mt-3" placeholder="Suche nach Fach oder Material">
