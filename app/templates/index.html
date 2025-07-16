@@ -6,7 +6,7 @@
     <title>Wochenplan</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" integrity="sha384-Gu3KVV2H9d+yA4QDpVB7VcOyhJlAVrcXd0thEjr4KznfaFPLe0xQJyonVxONa4ZC" crossorigin="anonymous">
 </head>
 <body>
     <div class="container mt-5">
@@ -14,7 +14,7 @@
             <h1>Wochenplan</h1>
             <div>
                 <a href="{{ url_for('main.settings') }}" class="btn">Einstellungen</a>
-                <a href="{{ url_for('main.download_ical') }}" class="btn">iCal-Export</a>
+                <a href="{{ url_for('exports.download_ical') }}" class="btn">iCal-Export</a>
             </div>
         </div>
         <button id="darkModeToggle" class="btn btn-secondary mt-3">Dunkelmodus umschalten</button>
@@ -31,8 +31,9 @@
                 <h5 class="mb-0">Neue Aufgabe hinzufügen</h5>
             </div>
             <div class="card-body">
-                <form method="POST" action="{{ url_for('main.home') }}">
+                <form method="POST" action="{{ url_for('main.home') }}" id="task-form">
                     {{ form.hidden_tag() }}
+                    <input type="hidden" name="form_context" value="add_task">
                     <div class="mb-3">
                         {{ form.learning_subject.label(class="form-label") }}
                         {{ form.learning_subject(class="form-control") }}
@@ -94,7 +95,7 @@
         </div>
     </div>
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/gsap.min.js" integrity="sha384-EXoMlsRz5LeM9I+svMr9NrSRlZc4GWlywJ430KvHETR8/bMX6mTyTLWdE/8GLWOF" crossorigin="anonymous"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

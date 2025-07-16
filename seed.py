@@ -1,6 +1,7 @@
 from app import create_app, db
 from app.models import Subject
 
+
 def seed_subjects():
     """Seeds the database with initial subjects."""
     app = create_app()
@@ -22,6 +23,7 @@ def seed_subjects():
                 subject = Subject(name=subject_name)
                 db.session.add(subject)
         db.session.commit()
+
 
 if __name__ == '__main__':
     seed_subjects()
