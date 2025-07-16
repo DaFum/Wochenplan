@@ -76,10 +76,9 @@ class ContentLibrary:
 
 # Beispiel für die Verwendung:
 # if __name__ == "__main__":
-#     # Das Singleton-Pattern stellt sicher, dass beide Variablen auf dieselbe Instanz verweisen.
+#     # Zwei separate Instanzen der ContentLibrary erstellen
 #     library_1 = ContentLibrary()
 #     library_2 = ContentLibrary()
-#     assert library_1 is library_2, "Singleton-Instanzen müssen identisch sein."
 #
 #     print("\nVerfügbare Fächer:")
 #     subjects = library_1.get_subjects()
