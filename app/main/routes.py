@@ -87,7 +87,11 @@ def send_reminder(task_id):
     task = task_manager.get_task(task_id)
     if task:
         notification_service.send_reminder(
-            recipient="user@example.com",  # In a real app, this would be the logged-in user's email
+notification_service.send_reminder(
+    recipient=session.get('user_email', 'default@example.com'),
+    message=f"Erinnerung für: {task.title}",
+    event_time=datetime.now() + timedelta(minutes=15)
+)
             message=f"Erinnerung für: {task.title}",
             event_time=datetime.now() + timedelta(minutes=15) # Placeholder time
         )
