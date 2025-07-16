@@ -22,20 +22,22 @@ class NotificationService:
         print(f"-> {message}")
         print("-" * 30)
 
+import logging
+
     def schedule_event_reminders(self, user_email: str, event: dict):
         """Plant Erinnerungen für ein Ereignis basierend auf Standardregeln."""
         event_name = event.get("summary", "Unbenanntes Ereignis")
         event_start = event.get("start")
 
         if not isinstance(event_start, datetime):
-            print(f"Fehler: Ungültige Startzeit für '{event_name}'.")
+            logging.error(f"Ungültige Startzeit für '{event_name}'.")
             return
 
         # Regel 1: Erinnerung 15 Minuten vor dem Event
         reminder_time_15_min = event_start - timedelta(minutes=15)
         if datetime.now() < reminder_time_15_min:
             # In einer echten App würde dies in einem Scheduler (z.B. APScheduler) registriert
-            print(f"Info: Erinnerung für '{event_name}' geplant um {reminder_time_15_min.strftime('%H:%M')}.")
+            logging.info(f"Erinnerung für '{event_name}' geplant um {reminder_time_15_min.strftime('%H:%M')}.")
 
         # Simuliere sofortiges Senden für Demo-Zwecke
         self.send_reminder(
