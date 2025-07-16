@@ -27,6 +27,11 @@ notification_service = NotificationService()
 
 @main_bp.route('/', methods=['GET', 'POST'])
 def home():
+    """
+    Zeigt die Startseite mit Aufgabenliste, Fächern, Formular und optional generiertem Text an.
+    
+    Bei Formularübermittlung mit Kontext 'add_task' wird eine neue Aufgabe hinzugefügt und eine entsprechende Rückmeldung angezeigt. Die Seite zeigt alle aktuellen Aufgaben, verfügbare Fächer, das Planungsformular sowie gegebenenfalls zuvor generierten Text an.
+    """
     form = PlannerForm()
     try:
         form.learning_subject.choices = content_library.get_subjects()
@@ -57,12 +62,25 @@ def home():
 
 @main_bp.route('/einstellungen', methods=['GET'])
 def settings():
+    """
+    Rendert die Einstellungsseite mit einer Liste verfügbarer Lernfächer.
+    
+    Gibt das Template 'settings.html' mit den abgerufenen Fächern zurück.
+    """
     subjects = content_library.get_subjects()
     return render_template('settings.html', subjects=subjects)
 
 
 @main_bp.route('/send-reminder/<task_id>')
 def send_reminder(task_id):
+    """
+    Sendet eine Erinnerungsbenachrichtigung für eine bestimmte Aufgabe an die im Nutzer-Session hinterlegte E-Mail-Adresse.
+    
+    Parameters:
+        task_id (str): Die ID der Aufgabe, für die eine Erinnerung gesendet werden soll.
+    
+    Gibt eine Erfolgsmeldung aus, wenn die Aufgabe gefunden wurde und die Erinnerung gesendet wurde, andernfalls eine Fehlermeldung. Leitet anschließend zur Startseite weiter.
+    """
     task = task_manager.get_task(task_id)
     if task:
         notification_service.send_reminder(

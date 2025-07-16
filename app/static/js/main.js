@@ -12,6 +12,11 @@ document.addEventListener('DOMContentLoaded', function() {
     let touchendX = 0;
     const tabsElement = document.getElementById('weekdaysTabs');
 
+ /**
+  * Erkennt horizontale Wischgesten und aktiviert entsprechend den nächsten oder vorherigen Tab.
+  *
+  * Erkennt einen Wisch nach links oder rechts anhand eines Schwellenwerts und löst einen Tabwechsel aus, indem der nächste oder vorherige Tab per Klick aktiviert wird.
+  */
  function handleGesture() {
      const swipeThreshold = 50; // Minimum pixels for a swipe
      if (touchendX < touchstartX - swipeThreshold) {

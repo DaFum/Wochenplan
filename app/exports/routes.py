@@ -27,6 +27,11 @@ task_manager = TaskManager()
 
 @exports_bp.route('/download-ical')
 def download_ical():
+    """
+    Exportiert alle Aufgaben als iCal-Datei zum Download.
+    
+    Gibt eine iCal-Datei mit allen aktuellen Aufgaben als Download zurück. Bei Fehlern während der Generierung wird eine entsprechende Fehlermeldung mit HTTP-Status 500 ausgegeben.
+    """
     tasks = task_manager.list_tasks()
     events = []
     for task in tasks:
@@ -57,6 +62,11 @@ def download_ical():
 
 @exports_bp.route('/download-pdf')
 def download_pdf():
+    """
+    Exportiert die Aufgabenliste als PDF-Datei und stellt sie zum Download bereit.
+    
+    Die Funktion rendert die Aufgaben mit einer HTML-Vorlage, wandelt das Ergebnis in eine PDF-Datei um und liefert diese als Download mit dem Dateinamen 'wochenplan.pdf' und dem MIME-Typ 'application/pdf' aus.
+    """
     tasks = get_task_manager().list_tasks()
     rendered_html = render_template('pdf_template.html', tasks=tasks)
     html = HTML(string=rendered_html)

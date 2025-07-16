@@ -7,12 +7,22 @@ from ics import Calendar, Event
 class ICalExporter:
     """Exportiert eine Liste von Ereignissen in eine .ics-Kalenderdatei."""
     def __init__(self):
+        """
+        Initialisiert eine neue Instanz des ICalExporter.
+        """
         logging.info("ICalExporter initialisiert.")
 
     def export_to_memory(self, events: List[Dict[str, Any]]) -> Optional[str]:
         """
-        Erstellt einen iCal-Kalender aus einer Liste von
-        Ereignis-Wörterbüchern und gibt ihn als String zurück.
+        Exportiert eine Liste von Ereignis-Wörterbüchern als iCalendar-String.
+        
+        Verarbeitet die übergebene Liste von Ereignissen, erstellt daraus einen iCal-Kalender und gibt diesen als String zurück. Ungültige Ereignisse ohne die erforderlichen Schlüssel ("summary", "start", "end") werden übersprungen.
+        
+        Parameter:
+            events (List[Dict[str, Any]]): Liste von Ereignis-Wörterbüchern mit mindestens den Schlüsseln "summary", "start" und "end".
+        
+        Returns:
+            Optional[str]: Der iCalendar-String, oder None, wenn keine gültigen Ereignisse exportiert werden konnten.
         """
         cal = Calendar()
         for event_data in events:

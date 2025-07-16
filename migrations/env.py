@@ -16,6 +16,11 @@ logger = logging.getLogger('alembic.env')
 
 
 def get_engine():
+    """
+    Gibt das SQLAlchemy-Engine-Objekt der aktuellen Flask-Anwendung zurück.
+    
+    Unterstützt sowohl Flask-SQLAlchemy-Versionen vor als auch ab Version 3, indem die jeweils passende Methode zur Engine-Ermittlung verwendet wird.
+    """
     try:
         # this works with Flask-SQLAlchemy<3 and Alchemical
         return current_app.extensions['migrate'].db.get_engine()
@@ -25,6 +30,12 @@ def get_engine():
 
 
 def get_engine_url():
+    """
+    Gibt die Datenbank-URL der aktuellen SQLAlchemy-Engine als String zurück, wobei das Passwort sichtbar bleibt und Prozentzeichen für Alembic korrekt maskiert werden.
+    
+    Gibt:
+        str: Die Datenbank-URL mit sichtbarem Passwort und doppelten Prozentzeichen.
+    """
     try:
         return get_engine().url.render_as_string(hide_password=False).replace(
             '%', '%%')
@@ -46,22 +57,21 @@ target_db = current_app.extensions['migrate'].db
 
 
 def get_metadata():
+    """
+    Gibt das SQLAlchemy-MetaData-Objekt für die Migrationserstellung zurück.
+    
+    Wenn das Ziel-Datenbankobjekt mehrere Metadaten verwaltet, wird das Standard-MetaData-Objekt (`metadatas[None]`) zurückgegeben, andernfalls das einzelne `metadata`-Attribut.
+    """
     if hasattr(target_db, 'metadatas'):
         return target_db.metadatas[None]
     return target_db.metadata
 
 
 def run_migrations_offline():
-    """Run migrations in 'offline' mode.
-
-    This configures the context with just a URL
-    and not an Engine, though an Engine is acceptable
-    here as well.  By skipping the Engine creation
-    we don't even need a DBAPI to be available.
-
-    Calls to context.execute() here emit the given string to the
-    script output.
-
+    """
+    Führt Datenbankmigrationen im 'Offline'-Modus aus, indem Migrationen ohne aktive Datenbankverbindung generiert werden.
+    
+    Im Offline-Modus wird Alembic mit der Datenbank-URL und dem SQLAlchemy-Metadata-Objekt konfiguriert. SQL-Literale werden direkt in die generierten Migrationsskripte eingebettet.
     """
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
@@ -73,17 +83,21 @@ def run_migrations_offline():
 
 
 def run_migrations_online():
-    """Run migrations in 'online' mode.
-
-    In this scenario we need to create an Engine
-    and associate a connection with the context.
-
+    """
+    Führt Datenbankmigrationen im 'Online'-Modus mit einer aktiven Datenbankverbindung durch.
+    
+    Konfiguriert Alembic mit einer bestehenden Verbindung und dem aktuellen SQLAlchemy-Metadata-Objekt. Unterdrückt die Generierung leerer Migrationsskripte, wenn keine Schemaänderungen erkannt werden.
     """
 
     # this callback is used to prevent an auto-migration from being generated
     # when there are no changes to the schema
     # reference: http://alembic.zzzcomputing.com/en/latest/cookbook.html
     def process_revision_directives(context, revision, directives):
+        """
+        Verhindert die Erstellung leerer Migrationsskripte bei der Autogenerierung.
+        
+        Wenn während der Autogenerierung keine Änderungen am Datenbankschema erkannt werden, werden die Migrationsdirektiven entfernt und ein Hinweis im Log ausgegeben.
+        """
         if getattr(config.cmd_opts, 'autogenerate', False):
             script = directives[0]
             if script.upgrade_ops.is_empty():
