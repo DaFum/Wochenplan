@@ -98,11 +98,9 @@ def generate_text():
     prompt = request.form.get('prompt')
     if prompt:
         try:
-         try:
-             with Text() as text_generator:
-                 generated_text = text_generator(prompt)
-                 session['generated_text'] = generated_text
-            session['generated_text'] = generated_text
+            with Text() as text_generator:
+                generated_text = text_generator(prompt)
+                session['generated_text'] = generated_text
         except (ConnectionError, TimeoutError):
             flash(
                 "Verbindungsfehler bei der Textgenerierung. "
