@@ -67,7 +67,7 @@ def download_pdf():
     
     Die Funktion rendert die Aufgaben mit einer HTML-Vorlage, wandelt das Ergebnis in eine PDF-Datei um und liefert diese als Download mit dem Dateinamen 'wochenplan.pdf' und dem MIME-Typ 'application/pdf' aus.
     """
-    tasks = get_task_manager().list_tasks()
+    tasks = task_manager.list_tasks()
     rendered_html = render_template('pdf_template.html', tasks=tasks)
     html = HTML(string=rendered_html)
     pdf = io.BytesIO()
