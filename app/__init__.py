@@ -17,6 +17,11 @@ limiter = Limiter(
     default_limits=["200 per day", "50 per hour"]
 )
 
+from .modules.content_library import ContentLibrary
+from .modules.task_manager import TaskManager
+from .modules.ical_exporter import ICalExporter
+from .modules.notification_service import NotificationService
+
 def create_app():
     """
     Erstellt und konfiguriert eine Flask-Anwendung mit Datenbank, Migrationen, CSRF-Schutz und Ratenbegrenzung.
@@ -48,5 +53,10 @@ def create_app():
         app.register_blueprint(main_routes.main_bp)
         app.register_blueprint(api_bp, url_prefix='/api')
         app.register_blueprint(exports_bp)
+
+        app.content_library = ContentLibrary()
+        app.task_manager = TaskManager()
+        app.ical_exporter = ICalExporter()
+        app.notification_service = NotificationService()
 
     return app
