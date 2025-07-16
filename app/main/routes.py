@@ -80,8 +80,10 @@ def generate_text():
     prompt = request.form.get('prompt')
     if prompt:
         try:
-            text_generator = Text()
-            generated_text = text_generator(prompt)
+         try:
+             with Text() as text_generator:
+                 generated_text = text_generator(prompt)
+                 session['generated_text'] = generated_text
             session['generated_text'] = generated_text
         except (ConnectionError, TimeoutError):
             flash(
