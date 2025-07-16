@@ -1,42 +1,49 @@
 /* Root Variables */
 :root {
-    --color-background: #f8f9fa;
-    --color-text: #000000;
-    --color-primary: #0056b3;
-    --color-secondary: #6c757d;
-    --color-accent: #17a2b8;
-    --color-border: #dee2e6;
-    --color-highlight: #e9ecef;
-    --color-light: #ffffff;
-    --color-dark-background: #212529;
-    --color-dark-text: #f8f9fa;
-    --color-muted: #6c757d;
+    --color-background: #F7F7F7;
+    --color-text: #333333;
+    --color-primary: #FF6B6B;
+    --color-secondary: #4ECDC4;
+    --color-accent: #FFD93D;
+    --color-border: #E0E0E0;
+    --color-highlight: #FFFFFF;
+    --color-light: #FFFFFF;
+    --color-dark-background: #2c3e50;
+    --color-dark-text: #ecf0f1;
+    --color-muted: #95a5a6;
 }
 
 .header {
-    background-color: var(--color-primary);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
     color: var(--color-light);
     padding: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-radius: 10px;
+    border-radius: 20px;
     margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
 }
 
 .header h1 {
-    font-size: 2rem;
+    font-size: 2.5rem;
     margin: 0;
+    font-weight: bold;
 }
 
 .header .btn {
     background-color: var(--color-light);
     color: var(--color-primary);
     border: none;
+    font-weight: bold;
+    border-radius: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .header .btn:hover {
     background-color: var(--color-highlight);
+    transform: translateY(-2px);
 }
 
 /* General Reset and Styling */
@@ -49,7 +56,7 @@ html {
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-family: "Comic Sans MS", "Chalkboard SE", "Marker Felt", sans-serif;
     background-color: var(--color-background);
     color: var(--color-text);
     line-height: 1.6;
@@ -61,7 +68,7 @@ body {
 
 /* Sticky Header Styling */
 .sticky-header {
-    background-color: var(--color-primary);
+    background: var(--color-secondary);
     color: var(--color-light);
     padding: 10px 20px;
     position: sticky;
@@ -89,18 +96,22 @@ body {
 }
 
 .nav-list a:hover {
-    color: #ffcc00;
+    color: var(--color-accent);
 }
 
-.nav-tabs .nav-link:hover {
-    background-color: var(--color-highlight);
-    border-color: var(--color-highlight);
+.nav-tabs .nav-link {
+    border: 2px solid transparent;
+    border-radius: 15px 15px 0 0;
+    color: var(--color-secondary);
+    font-weight: bold;
 }
 
-.btn-primary:hover {
-background-color: var(--color-primary-darker);
-border-color: var(--color-primary-darker);
+.nav-tabs .nav-link:hover, .nav-tabs .nav-link.active {
+    background-color: var(--color-secondary);
+    color: var(--color-light);
+    border-color: var(--color-secondary);
 }
+
 
 /* Title Styling */
 .title {
@@ -119,8 +130,8 @@ border-color: var(--color-primary-darker);
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
     background-color: var(--color-light);
-    border: 1px solid var(--color-border);
-    border-radius: 10px;
+    border: 2px dashed var(--color-border);
+    border-radius: 20px;
     padding: 25px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     margin-top: 20px;
@@ -129,15 +140,17 @@ border-color: var(--color-primary-darker);
 }
 
 .card {
-    background-color: #fafafa;
-    border-radius: 10px;
-    padding: 15px;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s;
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    border-left: 10px solid var(--color-secondary);
 }
 
 .card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-10px) rotate(2deg);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
 }
 
 /* Task and Learning Task Styling */
@@ -147,7 +160,7 @@ border-color: var(--color-primary-darker);
     margin-bottom: 20px;
     background-color: var(--color-highlight);
     padding: 15px;
-    border-radius: 6px;
+    border-radius: 15px;
     border: 1px solid var(--color-border);
     transition: background-color 0.3s, box-shadow 0.3s;
 }
@@ -163,11 +176,11 @@ border-color: var(--color-primary-darker);
     margin-bottom: 5px;
 }
 
-.custom-form-control {
+.custom-form-control, .form-control {
     width: 100%;
     padding: 0.75rem 1rem;
-    border-radius: 0.25rem;
-    border: 1px solid var(--color-border);
+    border-radius: 15px;
+    border: 2px solid var(--color-border);
     outline: none;
     font-size: 1rem;
     margin-bottom: 1rem;
@@ -180,31 +193,31 @@ border-color: var(--color-primary-darker);
 
 .form-control:focus {
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 0.25rem rgba(0, 86, 179, 0.25);
+    box-shadow: 0 0 0 0.25rem rgba(255, 107, 107, 0.5);
 }
 
 /* Button Styling */
-button {
-    background: linear-gradient(135deg, var(--color-primary), #0056b3);
+.btn, button {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
     color: var(--color-light);
-    font-size: 1em;
+    font-size: 1.2em;
     font-weight: bold;
     border: none;
-    border-radius: 40px;
-    padding: 12px 25px;
+    border-radius: 25px;
+    padding: 12px 30px;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
-    display: block;
-    margin: 30px auto;
+    display: inline-block;
+    margin: 10px 0;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
 }
 
-button:hover {
-    background: linear-gradient(135deg, var(--color-accent), #003f7f);
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(23, 162, 184, 0.2);
+.btn:hover, button:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
-button:active {
+.btn:active, button:active {
     transform: translateY(0);
     box-shadow: none;
 }
@@ -219,6 +232,7 @@ a {
 
 a:hover {
     text-decoration: underline;
+    color: var(--color-secondary);
 }
 
 /* Flash Message Styling */
@@ -231,21 +245,25 @@ a:hover {
 }
 
 .flash-messages li {
-    padding: 12px;
-    border-radius: 5px;
-    margin-bottom: 8px;
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 10px;
     font-weight: bold;
-    font-size: 0.9em;
+    font-size: 1em;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .flash-messages .success {
-    background-color: #d4edda;
-    color: #155724;
+    background-color: #a7e9af;
+    color: #1b5e20;
+    border-left: 10px solid #4caf50;
 }
 
 .flash-messages .error {
-    background-color: #f8d7da;
-    color: #721c24;
+    background-color: #ffcdd2;
+    color: #b71c1c;
+    border-left: 10px solid #f44336;
 }
 
 /* Dark Mode */
@@ -255,65 +273,52 @@ body.dark-mode {
 }
 
 body.dark-mode .header {
-    background-color: #1a1a1a;
+    background: linear-gradient(135deg, #1e272e, #485460);
 }
 
 body.dark-mode .planner {
     background-color: var(--color-dark-background);
-    border-color: #444;
+    border-color: #4a6fa5;
 }
 
 body.dark-mode .card {
-    background-color: #2c2c2c;
-    border-color: #444;
+    background-color: #34495e;
+    border-color: #4a6fa5;
+    border-left: 10px solid var(--color-accent);
 }
 
 body.dark-mode .task, body.dark-mode .learning-task {
-    background-color: #3a3a3a;
-    border-color: #555;
+    background-color: #2c3e50;
+    border-color: #4a6fa5;
 }
 
 body.dark-mode .form-control {
-    background-color: #3a3a3a;
+    background-color: #2c3e50;
     color: var(--color-dark-text);
-    border-color: #555;
+    border-color: #4a6fa5;
 }
 
 body.dark-mode .form-control:focus {
-    background-color: #3a3a3a;
+    background-color: #2c3e50;
     color: var(--color-dark-text);
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 0.25rem rgba(0, 86, 179, 0.5);
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 0.25rem rgba(255, 217, 61, 0.5);
 }
 
-body.dark-mode .btn-primary {
-    background-color: var(--color-primary);
-    border-color: var(--color-primary);
+
+body.dark-mode .btn, body.dark-mode button {
+    background: linear-gradient(135deg, var(--color-secondary), var(--color-accent));
 }
 
-body.dark-mode .btn-primary:hover {
-    background-color: #004494;
-    border-color: #004494;
-}
-
-body.dark-mode .btn-secondary {
-    background-color: var(--color-secondary);
-    border-color: var(--color-secondary);
-}
-
-body.dark-mode .btn-secondary:hover {
-    background-color: #5a6268;
-    border-color: #5a6268;
-}
 
 body.dark-mode .nav-tabs .nav-link {
     color: var(--color-dark-text);
-    border-color: #444;
+    border-color: #4a6fa5;
 }
 
 body.dark-mode .nav-tabs .nav-link.active {
-    background-color: #2c2c2c;
-    border-color: #444;
+    background-color: #34495e;
+    border-color: #4a6fa5;
 }
 
 /* Dark Mode Toggle Button */
@@ -321,7 +326,7 @@ body.dark-mode .nav-tabs .nav-link.active {
     position: fixed;
     top: 15px;
     right: 15px;
-    background-color: var(--color-primary);
+    background-color: var(--color-secondary);
     color: var(--color-light);
     border: none;
     border-radius: 50%;
@@ -329,11 +334,12 @@ body.dark-mode .nav-tabs .nav-link.active {
     cursor: pointer;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     transition: background-color 0.3s, transform 0.3s;
+    font-size: 1.5rem;
 }
 
 .dark-mode-toggle:hover {
     background-color: var(--color-accent);
-    transform: rotate(360deg);
+    transform: rotate(360deg) scale(1.1);
 }
 
 .dark-mode-toggle:focus {
@@ -342,7 +348,6 @@ body.dark-mode .nav-tabs .nav-link.active {
 
 /* Animations */
 .fade-in {
-    opacity: 0;
     animation: fadeIn 0.5s forwards;
 }
 
@@ -353,12 +358,14 @@ body.dark-mode .nav-tabs .nav-link.active {
 }
 
 .slide-up {
-    transform: translateY(20px);
-    opacity: 0;
     animation: slideUp 0.5s forwards;
 }
 
 @keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
     to {
         transform: translateY(0);
         opacity: 1;
@@ -373,16 +380,16 @@ body, .card, .button, .planner {
 /* Responsive Design */
 @media (max-width: 768px) {
     .planner {
-        padding: 20px;
+        padding: 15px;
     }
 
     .task, .learning-task {
         flex-direction: column;
     }
 
-    button {
+    .btn, button {
         width: 100%;
-        margin: 20px 0;
+        margin: 10px 0;
     }
 
     .dark-mode-toggle {
