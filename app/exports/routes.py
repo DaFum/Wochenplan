@@ -1,30 +1,18 @@
 from datetime import datetime, timedelta
-
-from flask import send_file
-from weasyprint import HTML
-
-from app.modules.ical_exporter import ICalExporter
-from app.modules.task_manager import TaskManager
-from . import exports_bp
-
-ical_exporter = ICalExporter()
-task_manager = TaskManager()
-
-
-from datetime import datetime, timedelta
 import io
 
-from flask import send_file
+from flask import send_file, render_template
 from weasyprint import HTML
 
 from app.modules.ical_exporter import ICalExporter
 from app.modules.task_manager import TaskManager
 from . import exports_bp
 
+import logging
+logger = logging.getLogger(__name__)
+
 ical_exporter = ICalExporter()
 task_manager = TaskManager()
-
-
 @exports_bp.route('/download-ical')
 def download_ical():
     """
