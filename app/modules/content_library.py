@@ -4,9 +4,20 @@
 
 class ContentLibrary:
     """
-    Stellt als Singleton eine Bibliothek mit vordefinierten Fächern und
+    Stellt eine Bibliothek mit vordefinierten Fächern und
     Aufgaben bereit.
     """
+    _instance = None
+    _initialized = False
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __init__(self):
+        if not self._initialized:
+            ContentLibrary._initialized = True
     _SUBJECTS: List[str] = [
         "Mathematik", "Deutsch", "Englisch", "Physik", "Chemie", "Biologie",
         "Geschichte", "Geographie", "Informatik", "Kunst", "Musik", "Sport"
