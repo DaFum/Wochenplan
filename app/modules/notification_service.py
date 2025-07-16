@@ -10,17 +10,17 @@ class NotificationService:
     def __init__(self):
         print("NotificationService initialisiert.")
 
+import logging
+
     def send_reminder(self, recipient: str, message: str, event_time: datetime):
         """
         Sendet eine Erinnerung an einen Empfänger.
         In einer echten Anwendung würde dies eine E-Mail, Push-Benachrichtigung etc. auslösen.
         """
-        print("-" * 30)
-        print(f"AN: {recipient}")
-        print(f"ZEITPUNKT: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        print(f"ERINNERUNG für Event um {event_time.strftime('%H:%M')}:")
-        print(f"-> {message}")
-        print("-" * 30)
+        logging.info(
+            f"Erinnerung gesendet an {recipient} "
+            f"für Event um {event_time.strftime('%H:%M')}: {message}"
+        )
 
 import logging
 
