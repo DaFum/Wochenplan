@@ -39,9 +39,14 @@ def download_ical():
             "description": getattr(task, 'description', '') or ''
         })
 
-    ical_string = ical_exporter.export_to_memory(events)
-    if ical_string is None:
-        return "Could not generate iCal file.", 500
+    try:
+        ical_string = ical_exporter.export_to_memory(events)
+        if ical_string is None:
+            logger.error("ICalExporter returned None")
+            return "Fehler bei der iCal-Generierung.", 500
+    except Exception as e:
+        logger.error(f"Fehler beim iCal-Export: {e}")
+        return "Interner Serverfehler.", 500
 
     return send_file(
         io.BytesIO(ical_string.encode('utf-8')),
