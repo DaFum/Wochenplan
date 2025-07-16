@@ -64,7 +64,12 @@ def download_ical():
             "summary": task.title,
             "start": datetime.now(),
             "end": datetime.now() + timedelta(hours=1),
-            "description": task.description
+        events.append({
+            "summary": task.title,
+            "start": task_start,
+            "end": task_end,
+            "description": getattr(task, 'description', '') or ''
+        })
         })
 
     file_path = "wochenplan.ics"
