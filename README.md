@@ -6,7 +6,7 @@ This document outlines the steps taken to make the Wochenplan application produc
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/wochenplan.git
+git clone https://github.com/DaFum/Wochenplan.git
     cd wochenplan
     ```
 
