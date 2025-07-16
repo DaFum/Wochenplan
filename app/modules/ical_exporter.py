@@ -38,17 +38,19 @@ class ICalExporter:
                 event.description = event_data["description"]
             cal.events.add(event)
 
+import logging
+
         if not cal.events:
-            print("Fehler: Keine gültigen Ereignisse zum Exportieren gefunden.")
+            logging.error("Keine gültigen Ereignisse zum Exportieren gefunden.")
             return False
 
         try:
             with open(filename, 'w', encoding='utf-8') as f:
                 f.write(str(cal))
-            print(f"Wochenplan erfolgreich nach '{filename}' exportiert.")
+            logging.info(f"Wochenplan erfolgreich nach '{filename}' exportiert.")
             return True
         except IOError as e:
-            print(f"Fehler beim Schreiben der Datei '{filename}': {e}")
+            logging.error(f"Fehler beim Schreiben der Datei '{filename}': {e}")
             return False
 
 # Beispiel für die Verwendung:
