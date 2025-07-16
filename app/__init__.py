@@ -22,6 +22,7 @@ def create_app():
     csrf.init_app(app)
 
     with app.app_context():
+        db.create_all()
         from .main import routes
         app.register_blueprint(routes.main_bp)
 

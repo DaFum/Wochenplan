@@ -17,9 +17,6 @@ logging.basicConfig(
 app = create_app()
 migrate = Migrate(app, db)
 
-@app.before_request
-def before_request():
-    db.create_all()
 
 # Add health check endpoint for Render
 @app.route('/health')
