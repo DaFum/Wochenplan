@@ -5,10 +5,12 @@
 
 from datetime import datetime, timedelta
 
+import logging
+
 class NotificationService:
     """Ein Dienst zum Senden von Benachrichtigungen."""
     def __init__(self):
-        print("NotificationService initialisiert.")
+        logging.info("NotificationService initialisiert.")
 
 import logging
 
