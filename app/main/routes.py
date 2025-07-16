@@ -24,7 +24,13 @@ notification_service = NotificationService()
 @main_bp.route('/', methods=['GET', 'POST'])
 def home():
     form = PlannerForm()
-    form.learning_subject.choices = content_library.get_subjects()
+    try:
+        form.learning_subject.choices = content_library.get_subjects()
+    except Exception as e:
+        logger.error(f"Failed to load subjects: {e}")
+        form.learning_subject.choices = []
+        flash("Fächer konnten nicht geladen werden.", "warning")
+
     if form.validate_on_submit():
         try:
             task_manager.add_task(title=form.learning_task.data)
@@ -35,7 +41,13 @@ def home():
 
     tasks = task_manager.list_tasks()
     generated_text = session.pop('generated_text', None)
-    return render_template('index.html', tasks=tasks, subjects=content_library.get_subjects(), form=form, generated_text=generated_text)
+    return render_template(
+        'index.html',
+        tasks=tasks,
+        subjects=content_library.get_subjects(),
+        form=form,
+        generated_text=generated_text
+    )
 
 
 @main_bp.route('/einstellungen', methods=['GET'])
