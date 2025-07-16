@@ -57,9 +57,12 @@ def download_ical():
 
 @exports_bp.route('/download-pdf')
 def download_pdf():
-    # This is a placeholder for PDF generation
-    html = HTML(string="<h1>Wochenplan</h1><p>This is a placeholder PDF.</p>")
-    pdf = html.write_pdf()
+    tasks = get_task_manager().list_tasks()
+    rendered_html = render_template('pdf_template.html', tasks=tasks)
+    html = HTML(string=rendered_html)
+    pdf = io.BytesIO()
+    html.write_pdf(target=pdf)
+    pdf.seek(0)
     return send_file(
         pdf,
         as_attachment=True,
