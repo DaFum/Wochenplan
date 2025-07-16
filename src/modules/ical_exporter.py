@@ -4,7 +4,6 @@
 # [PRAISE] Die Implementierung ist sauber, effizient und folgt bewährten Praktiken.
 
 from ics import Calendar, Event
-from datetime import datetime
 from typing import List, Dict, Any
 
 class ICalExporter:
