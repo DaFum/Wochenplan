@@ -34,3 +34,16 @@ class PlannerEntry(db.Model):
     learning_subject = db.relationship(
         'Subject', foreign_keys=[learning_subject_id]
     )
+
+
+class Task(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(200))
+    priority = db.Column(db.String(20), default='MEDIUM')
+    status = db.Column(db.String(20), default='OPEN')
+    start_time = db.Column(db.DateTime)
+    end_time = db.Column(db.DateTime)
+
+    def __repr__(self):
+        return f"<Task {self.title}>"
