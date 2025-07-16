@@ -30,8 +30,33 @@ class Text:
         :param kwargs: Weitere Standardparameter, die bei jeder Anfrage gesendet werden (z.B. system, seed).
         """
         self._default_params = {"model": model, **kwargs}
+    def __init__(self, model: Model = "openai", **kwargs: Kwargs):
+        """
+        Initialisiert den Text-Client mit Standardparametern.
+        """
+        self._default_params = {"model": model, **kwargs}
         self._sync_client = httpx.Client(timeout=120.0)
         self._async_client = httpx.AsyncClient(timeout=120.0)
+
+    def close(self):
+        """Schließt die HTTP-Clients und gibt Ressourcen frei."""
+        self._sync_client.close()
+
+    async def aclose(self):
+        """Schließt die HTTP-Clients asynchron und gibt Ressourcen frei."""
+        await self._async_client.aclose()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.aclose()
 
     def _prepare_payload(self, prompt: Optional[Prompt], **kwargs: Kwargs) -> Dict[str, Any]:
         """Erstellt die Anfrage-Payload durch Mischen der Standard- und Laufzeitparameter."""
