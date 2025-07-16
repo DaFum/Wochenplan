@@ -12,6 +12,8 @@ from pollinations.text import Text
 
 from .forms import PlannerForm
 
+
+logger = logging.getLogger(__name__)
 main_bp = Blueprint('main', __name__)
 
 WEEKDAYS = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"]
@@ -72,9 +74,6 @@ def send_reminder(task_id):
     else:
         flash("Aufgabe nicht gefunden.", "error")
     return redirect(url_for('main.home'))
-
-logger = logging.getLogger(__name__)
-
 
 @main_bp.route('/generate-text', methods=['POST'])
 def generate_text():

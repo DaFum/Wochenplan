@@ -11,23 +11,29 @@ ical_exporter = ICalExporter()
 task_manager = TaskManager()
 
 
+import io
+
+
 @exports_bp.route('/download-ical')
 def download_ical():
     tasks = task_manager.list_tasks()
     events = []
     for task in tasks:
+        start_time = task.start_time or datetime.now()
+        end_time = task.end_time or start_time + timedelta(hours=1)
         events.append({
             "summary": task.title,
-            "start": datetime.now(),
-            "end": datetime.now() + timedelta(hours=1),
+            "start": start_time,
+            "end": end_time,
             "description": getattr(task, 'description', '') or ''
         })
 
-    file_path = "wochenplan.ics"
-    ical_exporter.export_to_file(events, file_path)
+    ical_string = ical_exporter.export_to_memory(events)
+    if ical_string is None:
+        return "Could not generate iCal file.", 500
 
     return send_file(
-        file_path,
+        io.BytesIO(ical_string.encode('utf-8')),
         as_attachment=True,
         download_name='wochenplan.ics',
         mimetype='text/calendar'

@@ -1,6 +1,7 @@
 import logging
 import uuid
 from dataclasses import dataclass, field
+from datetime import datetime
 from enum import Enum, auto
 from typing import Dict, List, Optional
 
@@ -26,6 +27,8 @@ class Task:
     description: Optional[str] = None
     priority: TaskPriority = TaskPriority.MEDIUM
     status: TaskStatus = TaskStatus.OPEN
+    start_time: Optional[datetime] = None
+    end_time: Optional[datetime] = None
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
 
 
@@ -39,14 +42,20 @@ class TaskManager:
         self,
         title: str,
         description: Optional[str] = None,
-        priority: TaskPriority = TaskPriority.MEDIUM
+        priority: TaskPriority = TaskPriority.MEDIUM,
+        start_time: Optional[datetime] = None,
+        end_time: Optional[datetime] = None
     ) -> Task:
         """Fügt eine neue Aufgabe hinzu und gibt sie zurück."""
         if not title:
             raise ValueError("Der Titel darf nicht leer sein.")
 
         new_task = Task(
-            title=title, description=description, priority=priority
+            title=title,
+            description=description,
+            priority=priority,
+            start_time=start_time,
+            end_time=end_time
         )
         self._tasks[new_task.id] = new_task
         logging.info(f"Aufgabe hinzugefügt: '{title}' (ID: {new_task.id})")
