@@ -6,8 +6,6 @@ class ContentLibrary:
     Stellt als Singleton eine Bibliothek mit vordefinierten Fächern und
     Aufgaben bereit.
     """
-    _instance: Optional['ContentLibrary'] = None
-
     _SUBJECTS: List[str] = [
         "Mathematik", "Deutsch", "Englisch", "Physik", "Chemie", "Biologie",
         "Geschichte", "Geographie", "Informatik", "Kunst", "Musik", "Sport"
@@ -31,20 +29,6 @@ class ContentLibrary:
             "Recherche für Referat"
         ]
     }
-
-    def __new__(cls) -> 'ContentLibrary':
-        """
-        Erzeugt eine einzelne Instanz der ContentLibrary-Klasse (Singleton) und gibt sie zurück.
-        
-        Wird die Klasse zum ersten Mal instanziiert, wird die Singleton-Instanz erstellt und eine Initialisierungsnachricht ausgegeben. Bei weiteren Instanziierungen wird stets dieselbe Instanz zurückgegeben.
-        
-        Returns:
-            ContentLibrary: Die einzige Instanz der ContentLibrary-Klasse.
-        """
-        if cls._instance is None:
-            cls._instance = super(ContentLibrary, cls).__new__(cls)
-            print("ContentLibrary Singleton initialisiert.")
-        return cls._instance
 
     def get_subjects(self) -> List[str]:
         """
