@@ -42,8 +42,12 @@ class ContentLibrary:
         Gibt eine Liste vordefinierter Aufgaben für ein bestimmtes Fach zurück.
         Fallenback auf allgemeine Aufgaben, wenn das Fach nicht existiert.
         """
++       if not isinstance(subject, str):
++           raise TypeError("Subject muss ein String sein.")
++
         if subject not in self._SUBJECTS:
-            print(f"Warnung: Fach '{subject}' nicht in Bibliothek. Gebe allgemeine Aufgaben zurück.")
+-           print(f"Warnung: Fach '{subject}' nicht in Bibliothek. Gebe allgemeine Aufgaben zurück.")
++           # Use logging instead of print for production
             return self._TASKS_BY_SUBJECT.get("Allgemein", [])
 
         specific_tasks = self._TASKS_BY_SUBJECT.get(subject, [])
