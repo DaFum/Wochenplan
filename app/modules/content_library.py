@@ -1,5 +1,4 @@
--from typing import Dict, List, Optional
-+from typing import Dict, List
+from typing import Dict, List
 
 
 class ContentLibrary:
