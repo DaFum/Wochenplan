@@ -24,6 +24,7 @@ notification_service = NotificationService()
 @main_bp.route('/', methods=['GET', 'POST'])
 def home():
     form = PlannerForm()
+    form.learning_subject.choices = content_library.get_subjects()
     if form.validate_on_submit():
         try:
             task_manager.add_task(title=form.learning_task.data)
