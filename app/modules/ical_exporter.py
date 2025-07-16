@@ -6,10 +6,12 @@
 from ics import Calendar, Event
 from typing import List, Dict, Any
 
+import logging
+
 class ICalExporter:
     """Exportiert eine Liste von Ereignissen in eine .ics-Kalenderdatei."""
     def __init__(self):
-        print("ICalExporter initialisiert.")
+        logging.info("ICalExporter initialisiert.")
 
     def export_to_file(self, events: List[Dict[str, Any]], filename: str) -> bool:
         """
