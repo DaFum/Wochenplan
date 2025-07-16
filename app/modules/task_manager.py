@@ -51,14 +51,16 @@ import logging
         """Ruft eine Aufgabe anhand ihrer ID ab."""
         return self._tasks.get(task_id)
 
+import logging
+
     def update_task_status(self, task_id: str, status: TaskStatus) -> bool:
         """Aktualisiert den Status einer Aufgabe."""
         task = self.get_task(task_id)
         if task:
             task.status = status
-            print(f"Status von Aufgabe {task_id} auf {status.name} geändert.")
+            logging.info(f"Status von Aufgabe {task_id} auf {status.name} geändert.")
             return True
-        print(f"Fehler: Aufgabe mit ID {task_id} nicht gefunden.")
+        logging.error(f"Aufgabe mit ID {task_id} nicht gefunden.")
         return False
 
     def list_tasks(self) -> List[Task]:
