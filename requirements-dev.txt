@@ -1,0 +1,6 @@
+-r requirements.txt
+bandit==1.8.6
+flake8==7.3.0
+pbr==6.1.1
+pyflakes==3.4.0
+stevedore==5.4.1
