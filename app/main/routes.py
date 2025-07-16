@@ -104,8 +104,23 @@ def generate_text():
             text_generator = Text()
             generated_text = text_generator(prompt)
             session['generated_text'] = generated_text
-        except (ConnectionError, TimeoutError) as e:
-            flash("Verbindungsfehler bei der Textgenerierung. Bitte versuchen Sie es später erneut.", "error")
+import logging
+
+logger = logging.getLogger(__name__)
+
+@main_bp.route('/generate-text', methods=['POST'])
+def generate_text():
+    prompt = request.form.get('prompt')
+    if prompt:
+        try:
+            text_generator = Text()
+            generated_text = text_generator(prompt)
+            session['generated_text'] = generated_text
+        except (ConnectionError, TimeoutError):
+            flash(
+                "Verbindungsfehler bei der Textgenerierung. Bitte versuchen Sie es später erneut.",
+                "error"
+            )
         except Exception as e:
             flash("Textgenerierung fehlgeschlagen. Bitte versuchen Sie es erneut.", "error")
             # Log the actual error for debugging
