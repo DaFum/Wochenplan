@@ -1,13 +1,10 @@
-# [UPDATES] Dieses Modul führt eine Bibliothek für vordefinierte Fächer und Aufgaben ein.
-# [IDEAS] Zukünftig könnte die Bibliothek durch benutzerdefinierte Vorlagen erweitert oder aus externen Konfigurationsdateien (JSON/YAML) geladen werden.
-# [ISSUES] Die aktuelle Inhaltsliste ist statisch und auf den deutschen Bildungskontext zugeschnitten. Eine Internationalisierung (i18n) wäre ein logischer nächster Schritt.
-# [PRAISE] Die Nutzung des Singleton-Patterns ist hier eine ausgezeichnete Wahl, um eine konsistente und ressourcenschonende Datenquelle zu gewährleisten.
+from typing import Dict, List, Optional
 
-from typing import List, Dict, Optional
 
 class ContentLibrary:
     """
-    Stellt als Singleton eine Bibliothek mit vordefinierten Fächern und Aufgaben bereit.
+    Stellt als Singleton eine Bibliothek mit vordefinierten Fächern und
+    Aufgaben bereit.
     """
     _instance: Optional['ContentLibrary'] = None
 
@@ -17,14 +14,22 @@ class ContentLibrary:
     ]
 
     _TASKS_BY_SUBJECT: Dict[str, List[str]] = {
-        "Mathematik": ["Hausaufgaben erledigen", "Formeln wiederholen", "Für Test lernen"],
+        "Mathematik": [
+            "Hausaufgaben erledigen", "Formeln wiederholen", "Für Test lernen"
+        ],
         "Deutsch": ["Lektüre lesen", "Aufsatz schreiben", "Grammatik üben"],
-        "Englisch": ["Vokabeln lernen", "Text zusammenfassen", "Präsentation vorbereiten"],
+        "Englisch": [
+            "Vokabeln lernen", "Text zusammenfassen",
+            "Präsentation vorbereiten"
+        ],
         "Physik": ["Experiment protokollieren", "Theorie zusammenfassen"],
         "Chemie": ["Reaktionsgleichungen üben", "Laborbericht schreiben"],
         "Biologie": ["Zellstrukturen zeichnen", "Fachbegriffe lernen"],
         "Informatik": ["Programmieraufgabe lösen", "Algorithmen analysieren"],
-        "Allgemein": ["Lernplan erstellen", "Mitschriften ordnen", "Recherche für Referat"]
+        "Allgemein": [
+            "Lernplan erstellen", "Mitschriften ordnen",
+            "Recherche für Referat"
+        ]
     }
 
     def __new__(cls) -> 'ContentLibrary':
@@ -39,8 +44,9 @@ class ContentLibrary:
 
     def get_tasks_for_subject(self, subject: str) -> List[str]:
         """
-        Gibt eine Liste vordefinierter Aufgaben für ein bestimmtes Fach zurück.
-        Fallenback auf allgemeine Aufgaben, wenn das Fach nicht existiert.
+        Gibt eine Liste vordefinierter Aufgaben für ein bestimmtes Fach
+        zurück. Fallenback auf allgemeine Aufgaben, wenn das Fach nicht
+        existiert.
         """
         if not isinstance(subject, str):
             raise TypeError("Subject muss ein String sein.")
@@ -51,11 +57,14 @@ class ContentLibrary:
 
         specific_tasks = self._TASKS_BY_SUBJECT.get(subject, [])
         general_tasks = self._TASKS_BY_SUBJECT.get("Allgemein", [])
-        # Kombiniert spezifische und allgemeine Aufgaben, um eine umfassendere Liste zu bieten.
+        # Kombiniert spezifische und allgemeine Aufgaben, um eine
+        # umfassendere Liste zu bieten.
         return specific_tasks + general_tasks
 
     def get_all_preset_tasks(self) -> Dict[str, List[str]]:
-        """Gibt alle vordefinierten Aufgaben, gruppiert nach Fach, zurück."""
+        """
+        Gibt alle vordefinierten Aufgaben, gruppiert nach Fach, zurück.
+        """
         return self._TASKS_BY_SUBJECT
 
 # Beispiel für die Verwendung:

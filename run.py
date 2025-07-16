@@ -27,10 +27,13 @@ if __name__ == "__main__":
     # Get port from environment (Render provides this)
     port = int(os.environ.get("PORT", 10000))
     debug = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
-    
+
+    # Determine host based on environment
+    host = "0.0.0.0" if os.environ.get("FLASK_ENV") == "production" else "127.0.0.1"  # nosec
+
     # Run with appropriate settings
     app.run(
-        host="0.0.0.0", 
+        host=host,
         port=port,
         debug=debug,
         threaded=True

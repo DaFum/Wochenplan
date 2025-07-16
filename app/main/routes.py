@@ -1,15 +1,19 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, send_file
-from app import db
-from .forms import PlannerForm
+import logging
 from datetime import datetime, timedelta
-import io
-from weasyprint import HTML
+
+from flask import (Blueprint, flash, redirect, render_template, request,
+                   session, url_for)
+
 from app.modules.content_library import ContentLibrary
-from app.modules.task_manager import TaskManager, TaskStatus
 from app.modules.ical_exporter import ICalExporter
 from app.modules.notification_service import NotificationService
+from app.modules.task_manager import TaskManager
 from pollinations.text import Text
 
+from .forms import PlannerForm
+
+
+logger = logging.getLogger(__name__)
 main_bp = Blueprint('main', __name__)
 
 WEEKDAYS = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"]
@@ -31,12 +35,13 @@ def home():
         form.learning_subject.choices = []
         flash("Fächer konnten nicht geladen werden.", "warning")
 
-    if form.validate_on_submit():
+    if form.validate_on_submit() and request.form.get('form_context') == 'add_task':
         try:
             task_manager.add_task(title=form.learning_task.data)
             flash("Aufgabe erfolgreich hinzugefügt!", "success")
         except Exception as e:
-            flash(f"Ein Fehler ist aufgetreten: {str(e)}", "error")
+            logger.error(f"Error adding task: {e}")
+            flash("Ein Fehler ist aufgetreten.", "error")
         return redirect(url_for('main.home'))
 
     tasks = task_manager.list_tasks()
@@ -55,45 +60,15 @@ def settings():
     subjects = content_library.get_subjects()
     return render_template('settings.html', subjects=subjects)
 
-@main_bp.route('/download-ical')
-def download_ical():
-    tasks = task_manager.list_tasks()
-    events = []
-    for task in tasks:
-        events.append({
-            "summary": task.title,
-            "start": datetime.now(),
-            "end": datetime.now() + timedelta(hours=1),
-        events.append({
-            "summary": task.title,
-            "start": task_start,
-            "end": task_end,
-            "description": getattr(task, 'description', '') or ''
-        })
-        })
-
-    file_path = "wochenplan.ics"
-    ical_exporter.export_to_file(events, file_path)
-
-    return send_file(
-        file_path,
-        as_attachment=True,
-        download_name='wochenplan.ics',
-        mimetype='text/calendar'
-    )
 
 @main_bp.route('/send-reminder/<task_id>')
 def send_reminder(task_id):
     task = task_manager.get_task(task_id)
     if task:
         notification_service.send_reminder(
-notification_service.send_reminder(
-    recipient=session.get('user_email', 'default@example.com'),
-    message=f"Erinnerung für: {task.title}",
-    event_time=datetime.now() + timedelta(minutes=15)
-)
+            recipient=session.get('user_email', 'default@example.com'),
             message=f"Erinnerung für: {task.title}",
-            event_time=datetime.now() + timedelta(minutes=15) # Placeholder time
+            event_time=datetime.now() + timedelta(minutes=15)
         )
         flash(f"Erinnerung für '{task.title}' gesendet.", "success")
     else:
@@ -108,25 +83,16 @@ def generate_text():
             text_generator = Text()
             generated_text = text_generator(prompt)
             session['generated_text'] = generated_text
-import logging
-
-logger = logging.getLogger(__name__)
-
-@main_bp.route('/generate-text', methods=['POST'])
-def generate_text():
-    prompt = request.form.get('prompt')
-    if prompt:
-        try:
-            text_generator = Text()
-            generated_text = text_generator(prompt)
-            session['generated_text'] = generated_text
         except (ConnectionError, TimeoutError):
             flash(
-                "Verbindungsfehler bei der Textgenerierung. Bitte versuchen Sie es später erneut.",
+                "Verbindungsfehler bei der Textgenerierung. "
+                "Bitte versuchen Sie es später erneut.",
                 "error"
             )
         except Exception as e:
-            flash("Textgenerierung fehlgeschlagen. Bitte versuchen Sie es erneut.", "error")
-            # Log the actual error for debugging
             logger.error(f"Text generation failed: {e}")
+            flash(
+                "Textgenerierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+                "error"
+            )
     return redirect(url_for('main.home'))
