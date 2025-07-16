@@ -35,6 +35,8 @@ class TaskManager:
         self._tasks: Dict[str, Task] = {}
         print("TaskManager initialisiert.")
 
+import logging
+
     def add_task(self, title: str, description: Optional[str] = None, priority: TaskPriority = TaskPriority.MEDIUM) -> Task:
         """Fügt eine neue Aufgabe hinzu und gibt sie zurück."""
         if not title:
@@ -42,7 +44,7 @@ class TaskManager:
 
         new_task = Task(title=title, description=description, priority=priority)
         self._tasks[new_task.id] = new_task
-        print(f"Aufgabe hinzugefügt: '{title}' (ID: {new_task.id})")
+        logging.info(f"Aufgabe hinzugefügt: '{title}' (ID: {new_task.id})")
         return new_task
 
     def get_task(self, task_id: str) -> Optional[Task]:
