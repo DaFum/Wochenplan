@@ -86,6 +86,10 @@ def generate_text():
             text_generator = Text()
             generated_text = text_generator(prompt)
             session['generated_text'] = generated_text
+        except (ConnectionError, TimeoutError) as e:
+            flash("Verbindungsfehler bei der Textgenerierung. Bitte versuchen Sie es später erneut.", "error")
         except Exception as e:
-            flash(f"Fehler bei der Textgenerierung: {str(e)}", "error")
+            flash("Textgenerierung fehlgeschlagen. Bitte versuchen Sie es erneut.", "error")
+            # Log the actual error for debugging
+            logger.error(f"Text generation failed: {e}")
     return redirect(url_for('main.home'))
