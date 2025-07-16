@@ -12,7 +12,10 @@
     <div class="container mt-5">
         <div class="header">
             <h1>Wochenplan</h1>
-            <a href="{{ url_for('main.settings') }}" class="btn">Einstellungen</a>
+            <div>
+                <a href="{{ url_for('main.settings') }}" class="btn">Einstellungen</a>
+                <a href="{{ url_for('main.download_ical') }}" class="btn">iCal-Export</a>
+            </div>
         </div>
         <button id="darkModeToggle" class="btn btn-secondary mt-3">Dunkelmodus umschalten</button>
         <input type="text" id="searchInput" class="form-control mt-3" placeholder="Suche nach Fach oder Material">
@@ -23,52 +26,50 @@
             </li>
             {% endfor %}
         </ul>
-        <div class="tab-content" id="weekdaysContent">
-            {% for day, data in days.items() %}
-            <div class="tab-pane fade {{ 'show active' if loop.first else '' }}" id="{{ day }}" role="tabpanel" aria-labelledby="{{ day }}-tab">
-                <div class="card mt-3 search-item">
-                    <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapse{{ day }}" aria-expanded="true" aria-controls="collapse{{ day }}">
-                        <h5 class="mb-0">{{ day }}</h5>
-                    </div>
-                    <div id="collapse{{ day }}" class="collapse show">
-                        <div class="card-body">
-                            <form method="POST" action="{{ url_for('main.home') }}">
-                                {{ form.hidden_tag() }}
-                                <div class="mb-3">
-                                    {{ form.subject1.label(class="form-label") }}
-                                    {{ form.subject1(class="form-control") }}
-                                </div>
-                                <div class="mb-3">
-                                    {{ form.material1.label(class="form-label") }}
-                                    {{ form.material1(class="form-control") }}
-                                </div>
-                                <div class="mb-3">
-                                    {{ form.subject2.label(class="form-label") }}
-                                    {{ form.subject2(class="form-control") }}
-                                </div>
-                                <div class="mb-3">
-                                    {{ form.material2.label(class="form-label") }}
-                                    {{ form.material2(class="form-control") }}
-                                </div>
-                                <div class="mb-3">
-                                    {{ form.learning_subject.label(class="form-label") }}
-                                    {{ form.learning_subject(class="form-control") }}
-                                </div>
-                                <div class="mb-3">
-                                    {{ form.learning_task.label(class="form-label") }}
-                                    {{ form.learning_task(class="form-control") }}
-                                </div>
-                                {{ form.submit(class="btn btn-primary") }}
-                            </form>
-                            <div class="mt-3">
-                                <p><strong>Aufgabe:</strong> {{ data.task|e }}</p>
-                                <p><strong>Tipp:</strong> {{ data.tip|e }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">Neue Aufgabe hinzufügen</h5>
             </div>
-            {% endfor %}
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('main.home') }}">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.learning_subject.label(class="form-label") }}
+                        {{ form.learning_subject(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.learning_task.label(class="form-label") }}
+                        {{ form.learning_task(class="form-control") }}
+                    </div>
+                    {{ form.submit(class="btn btn-primary") }}
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">Aufgabenliste</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    {% for task in tasks %}
+                    <li class="list-group-item">
+                        <h5>{{ task.title }}</h5>
+                        <p>{{ task.description }}</p>
+                        <span class="badge bg-secondary">{{ task.priority.name }}</span>
+                        <span class="badge
+                            {% if task.status.name == 'OPEN' %} bg-primary
+                            {% elif task.status.name == 'IN_PROGRESS' %} bg-warning
+                            {% else %} bg-success
+                            {% endif %}
+                        ">{{ task.status.name }}</span>
+                        <a href="{{ url_for('main.send_reminder', task_id=task.id) }}" class="btn btn-sm btn-info">Erinnerung</a>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item">Keine Aufgaben gefunden.</li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     </div>
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
