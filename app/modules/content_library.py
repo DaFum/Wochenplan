@@ -33,20 +33,39 @@ class ContentLibrary:
     }
 
     def __new__(cls) -> 'ContentLibrary':
+        """
+        Erzeugt eine einzelne Instanz der ContentLibrary-Klasse (Singleton) und gibt sie zurück.
+        
+        Wird die Klasse zum ersten Mal instanziiert, wird die Singleton-Instanz erstellt und eine Initialisierungsnachricht ausgegeben. Bei weiteren Instanziierungen wird stets dieselbe Instanz zurückgegeben.
+        
+        Returns:
+            ContentLibrary: Die einzige Instanz der ContentLibrary-Klasse.
+        """
         if cls._instance is None:
             cls._instance = super(ContentLibrary, cls).__new__(cls)
             print("ContentLibrary Singleton initialisiert.")
         return cls._instance
 
     def get_subjects(self) -> List[str]:
-        """Gibt eine Liste aller vordefinierten Fächer zurück."""
+        """
+        Gibt die Liste aller vordefinierten Schulfächer zurück.
+        
+        Returns:
+            List[str]: Eine Liste mit den Namen aller verfügbaren Fächer.
+        """
         return self._SUBJECTS
 
     def get_tasks_for_subject(self, subject: str) -> List[str]:
         """
-        Gibt eine Liste vordefinierter Aufgaben für ein bestimmtes Fach
-        zurück. Fallenback auf allgemeine Aufgaben, wenn das Fach nicht
-        existiert.
+        Gibt eine kombinierte Liste vordefinierter Aufgaben für das angegebene Fach zurück.
+        
+        Wenn das Fach nicht in der Bibliothek vorhanden ist, werden nur die allgemeinen Aufgaben zurückgegeben. Bei gültigen Fächern werden fachbezogene und allgemeine Aufgaben zusammengeführt.
+        
+        Parameters:
+            subject (str): Name des gewünschten Fachs.
+        
+        Returns:
+            List[str]: Liste der Aufgaben für das angegebene Fach.
         """
         if not isinstance(subject, str):
             raise TypeError("Subject muss ein String sein.")
@@ -63,7 +82,10 @@ class ContentLibrary:
 
     def get_all_preset_tasks(self) -> Dict[str, List[str]]:
         """
-        Gibt alle vordefinierten Aufgaben, gruppiert nach Fach, zurück.
+        Gibt das vollständige Wörterbuch aller vordefinierten Aufgaben nach Fach gruppiert zurück.
+        
+        Returns:
+            Dict[str, List[str]]: Ein Wörterbuch, das jedem Fach eine Liste von Aufgaben zuordnet.
         """
         return self._TASKS_BY_SUBJECT
 

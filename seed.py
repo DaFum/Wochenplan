@@ -3,7 +3,11 @@ from app.models import Subject
 
 
 def seed_subjects():
-    """Seeds the database with initial subjects."""
+    """
+    Fügt der Datenbank eine vordefinierte Liste von Schulfächern hinzu, sofern diese noch nicht existieren.
+    
+    Diese Funktion prüft für jedes Fach in der Liste, ob es bereits in der Datenbank vorhanden ist, und legt es gegebenenfalls neu an.
+    """
     app = create_app()
     with app.app_context():
         subjects = [

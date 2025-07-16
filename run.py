@@ -21,6 +21,12 @@ migrate = Migrate(app, db)
 # Add health check endpoint for Render
 @app.route('/health')
 def health_check():
+    """
+    Gibt den aktuellen Gesundheitsstatus und die Version des Dienstes als JSON-Antwort zurück.
+    
+    Returns:
+        tuple: Ein JSON-Objekt mit den Schlüsseln "status" und "version" sowie dem HTTP-Statuscode 200.
+    """
     return {'status': 'healthy', 'version': '1.0.0'}, 200
 
 if __name__ == "__main__":

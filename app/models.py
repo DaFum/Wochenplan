@@ -46,4 +46,10 @@ class Task(db.Model):
     end_time = db.Column(db.DateTime)
 
     def __repr__(self):
+        """
+        Gibt eine stringbasierte Repräsentation der Task-Instanz mit ihrem Titel zurück.
+        
+        Returns:
+            str: String-Repräsentation des Tasks im Format "<Task Titel>"
+        """
         return f"<Task {self.title}>"

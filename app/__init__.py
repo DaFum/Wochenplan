@@ -18,6 +18,14 @@ limiter = Limiter(
 )
 
 def create_app():
+    """
+    Erstellt und konfiguriert eine Flask-Anwendung mit Datenbank, Migrationen, CSRF-Schutz und Ratenbegrenzung.
+    
+    Die Anwendung lädt Konfigurationen aus Umgebungsvariablen, initialisiert Erweiterungen und registriert Blueprints für Haupt-, API- und Exportfunktionen.
+    
+    Returns:
+        app (Flask): Die vollständig konfigurierte Flask-Anwendung.
+    """
     app = Flask(__name__, static_folder='static', template_folder='templates')
     app.secret_key = os.getenv('SECRET_KEY')
     if not app.secret_key:

@@ -5,15 +5,21 @@ from datetime import datetime, timedelta
 class NotificationService:
     """Ein Dienst zum Senden von Benachrichtigungen."""
     def __init__(self):
+        """
+        Initialisiert eine neue Instanz des NotificationService.
+        """
         logging.info("NotificationService initialisiert.")
 
     def send_reminder(
         self, recipient: str, message: str, event_time: datetime
     ):
         """
-        Sendet eine Erinnerung an einen Empfänger.
-        In einer echten Anwendung würde dies eine E-Mail, Push-Benachrichtigung
-        etc. auslösen.
+        Sendet eine Erinnerungsnachricht an den angegebenen Empfänger für ein bestimmtes Ereignis.
+        
+        Parameters:
+            recipient (str): Die E-Mail-Adresse des Empfängers.
+            message (str): Der Inhalt der Erinnerungsnachricht.
+            event_time (datetime): Der Zeitpunkt des zu erinnernden Ereignisses.
         """
         logging.info(
             f"Erinnerung gesendet an {recipient} "
@@ -21,7 +27,11 @@ class NotificationService:
         )
 
     def schedule_event_reminders(self, user_email: str, event: dict):
-        """Plant Erinnerungen für ein Ereignis basierend auf Standardregeln."""
+        """
+        Plant und simuliert das Senden einer Erinnerungsbenachrichtigung für ein bevorstehendes Ereignis.
+        
+        Prüft, ob das Ereignis eine gültige Startzeit besitzt, berechnet eine Erinnerung 15 Minuten vor Beginn und plant diese, falls möglich. Unabhängig davon wird eine Erinnerungsnachricht sofort versendet, um das Verhalten zu demonstrieren.
+        """
         event_name = event.get("summary", "Unbenanntes Ereignis")
         event_start = event.get("start")
 
