@@ -31,9 +31,13 @@ class Task:
 
 class TaskManager:
     """Verwaltet einen Satz von Aufgaben."""
+import logging
+
+class TaskManager:
+    """Verwaltet einen Satz von Aufgaben."""
     def __init__(self):
         self._tasks: Dict[str, Task] = {}
-        print("TaskManager initialisiert.")
+        logging.info("TaskManager initialisiert.")
 
 import logging
 
