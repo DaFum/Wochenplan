@@ -4,10 +4,10 @@ from .forms import PlannerForm
 from datetime import datetime, timedelta
 import io
 from weasyprint import HTML
-from src.modules.content_library import ContentLibrary
-from src.modules.task_manager import TaskManager, TaskStatus
-from src.modules.ical_exporter import ICalExporter
-from src.modules.notification_service import NotificationService
+from app.modules.content_library import ContentLibrary
+from app.modules.task_manager import TaskManager, TaskStatus
+from app.modules.ical_exporter import ICalExporter
+from app.modules.notification_service import NotificationService
 from pollinations.text import Text
 
 main_bp = Blueprint('main', __name__)
