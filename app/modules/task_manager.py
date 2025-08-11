@@ -153,20 +153,23 @@ class TaskManager:
         return Task.query.order_by(Task.order).all()
 
     def reorder_task(self, task_id: str, new_position: int) -> bool:
-        """Ändert die Reihenfolge der Aufgaben basierend auf der neuen Position."""
-        task = self.get_task(task_id)
-        if not task:
-            logging.error(f"Aufgabe mit ID {task_id} nicht gefunden.")
-            return False
+      """Ändert die Reihenfolge der Aufgaben basierend auf der neuen Position."""
+      task = self.get_task(task_id)
+      if not task:
+          logging.error(f"Aufgabe mit ID {task_id} nicht gefunden.")
+          return False
 
-          tasks = Task.query.order_by(Task.order).all()
-          # Remove the task from the list by id to avoid O(n) 'in' check
-          tasks = [t for t in tasks if t.id != task.id]
-          tasks.insert(new_position, task)
-        for index, t in enumerate(tasks):
-            t.order = index
-        db.session.commit()
-        logging.info(
-            f"Aufgabe {task_id} wurde an Position {new_position} verschoben."
-        )
-        return True
+      # Fetch all tasks ordered by 'order'
+      tasks = Task.query.order_by(Task.order).all()
+      # Remove the target task by id for efficiency
+      tasks = [t for t in tasks if t.id != task.id]
+      # Insert the task at the desired new position
+      tasks.insert(new_position, task)
+      # Update order field for all tasks
+      for index, t in enumerate(tasks):
+          t.order = index
+      db.session.commit()
+      logging.info(
+          f"Aufgabe {task_id} wurde an Position {new_position} verschoben."
+      )
+      return True
