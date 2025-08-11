@@ -1,4 +1,4 @@
-from flask import jsonify
+from flask import jsonify, current_app
 
 from . import api_bp
 
@@ -12,3 +12,13 @@ def health_check():
         Response: JSON-Objekt mit den Schlüsseln "status" und "version".
     """
     return jsonify({'status': 'healthy', 'version': '1.0.0'})
+
+
+@api_bp.route('/library-tasks/<subject>')
+def library_tasks(subject):
+    """Return preset tasks for a given subject from the content library."""
+    try:
+        tasks = current_app.content_library.get_tasks_for_subject(subject)
+    except Exception:
+        return jsonify({'tasks': []}), 400
+    return jsonify({'tasks': tasks})

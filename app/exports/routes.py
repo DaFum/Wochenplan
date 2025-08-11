@@ -1,4 +1,5 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 import io
 
 from flask import send_file, render_template
@@ -22,14 +23,21 @@ def download_ical():
     """
     tasks = task_manager.list_tasks()
     events = []
+    tz = ZoneInfo("Europe/Berlin")
     for task in tasks:
-        start_time = task.start_time or datetime.now()
-        end_time = task.end_time or start_time + timedelta(hours=1)
+        start_time = task.due_date or datetime.now(tz)
+        if start_time.tzinfo is None:
+            start_time = start_time.replace(tzinfo=tz)
+        else:
+            start_time = start_time.astimezone(tz)
+        end_time = start_time + timedelta(hours=1)
         events.append({
             "summary": task.title,
             "start": start_time,
             "end": end_time,
-            "description": getattr(task, 'description', '') or ''
+            "description": getattr(task, 'description', '') or '',
+            "uid": f"task-{task.id}@wochenplan",
+            "dtstamp": datetime.now(timezone.utc),
         })
 
     try:

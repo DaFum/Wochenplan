@@ -12,20 +12,33 @@ Kwargs = Dict[str, Any]
 
 class Text:
     """
-    Eine Klasse zur Interaktion mit den Pollinations Text-API-Endpunkten,
-    die sowohl synchrone als auch asynchrone Operationen unterstützt.
-    """
-    API_ENDPOINT = "https://api.pollinations.ai/v2/text"
+    Eine Klasse zur Interaktion mit dem Pollinations Text-Endpunkt.
 
-    def __init__(self, model: Model = "openai", **kwargs: Kwargs):
-        """
-        Initialisiert eine neue Instanz des Text-Clients für die Pollinations Text-API.
-        
-        Legt das Standardmodell und optionale Standardparameter für alle Anfragen fest und erstellt synchrone sowie asynchrone HTTP-Clients mit 120 Sekunden Timeout.
-        """
-        self._default_params = {"model": model, **kwargs}
-        self._sync_client = httpx.Client(timeout=120.0)
-        self._async_client = httpx.AsyncClient(timeout=120.0)
+    Die aktuelle API erwartet eine Liste von Nachrichten (Chat-Format),
+    weshalb der Benutzerprompt intern in eine entsprechende Struktur
+    umgewandelt wird.
+    """
+    API_ENDPOINT = "https://text.pollinations.ai/"
+
+    def __init__(
+        self,
+        model: Model = "openai",
+        system: System = (
+            "You are a concise educational assistant that answers in German."
+        ),
+        *,
+        client: Optional[httpx.Client] = None,
+        async_client: Optional[httpx.AsyncClient] = None,
+        **kwargs: Kwargs,
+    ) -> None:
+        """Initialisiert die Klasse mit Standardpayload und HTTP-Clients."""
+        self._default_payload: Dict[str, Any] = {
+            "model": model,
+            "messages": [{"role": "system", "content": system}],
+            **kwargs,
+        }
+        self._sync_client = client or httpx.Client(timeout=120.0)
+        self._async_client = async_client or httpx.AsyncClient(timeout=120.0)
 
     def close(self):
         """
@@ -67,17 +80,17 @@ class Text:
         self, prompt: Optional[Prompt], **kwargs: Kwargs
     ) -> Dict[str, Any]:
         """
-        Erstellt die Anfrage-Payload für die Textgenerierung, indem Standardparameter mit einem optionalen Prompt und zusätzlichen Laufzeitparametern kombiniert werden.
-        
-        Parameter:
-            prompt (Optional[str]): Der zu generierende Texteingabe-Prompt. Wird nur hinzugefügt, wenn angegeben.
-        
-        Gibt zurück:
-            Dict[str, Any]: Die vollständige Payload für die API-Anfrage.
+        Erstellt die Anfrage-Payload für die Textgenerierung.
+
+        Der Benutzerprompt wird als neue Nachricht mit Rolle "user" an die
+        vorhandene Nachrichtenliste angehängt. Zusätzliche Parameter können
+        über ``kwargs`` übergeben werden.
         """
-        payload = self._default_params.copy()
+        payload = self._default_payload.copy()
+        messages = list(payload.get("messages", []))
         if prompt is not None:
-            payload["prompt"] = prompt
+            messages.append({"role": "user", "content": prompt})
+        payload["messages"] = messages
         payload.update(kwargs)
         return payload
 

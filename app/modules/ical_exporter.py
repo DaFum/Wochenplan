@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from ics import Calendar, Event
@@ -34,6 +35,8 @@ class ICalExporter:
             event.name = event_data["summary"]
             event.begin = event_data["start"]
             event.end = event_data["end"]
+            event.uid = event_data.get("uid")
+            event.created = event_data.get("dtstamp", datetime.now(timezone.utc))
             if "description" in event_data:
                 event.description = event_data["description"]
             cal.events.add(event)

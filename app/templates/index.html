@@ -42,6 +42,15 @@
                     <div class="mb-3">
                         {{ form.learning_task.label(class="form-label") }}
                         {{ form.learning_task(class="form-control") }}
+                        <datalist id="taskSuggestions"></datalist>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.due_date.label(class="form-label") }}
+                        {{ form.due_date(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.priority.label(class="form-label") }}
+                        {{ form.priority(class="form-select") }}
                     </div>
                     {{ form.submit(class="btn btn-primary", title="Speichert die Aufgabe, zeigt eine Bestätigung und lädt die Seite neu") }}
                 </form>
@@ -57,11 +66,19 @@
                     {% for task in tasks %}
                     <li class="list-group-item" data-id="{{ task.id }}">
                         <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h5 class="mb-1">{{ task.title }}</h5>
-                                <p class="mb-1">{{ task.description }}</p>
-                                <span class="badge bg-secondary">{{ task.priority }}</span>
-                                <span class="badge{% if task.status.name == 'OPEN' %} bg-primary{% elif task.status.name == 'IN_PROGRESS' %} bg-warning{% else %} bg-success{% endif %}">{{ task.status.name }}</span>
+                            <div class="d-flex">
+                                {% if task.image_url %}
+                                <img src="{{ task.image_url }}" alt="{{ task.title }}" width="64" class="me-3">
+                                {% endif %}
+                                <div>
+                                    <h5 class="mb-1">{{ task.title }}</h5>
+                                    <p class="mb-1">{{ task.description }}</p>
+                                    <span class="badge bg-secondary">{{ task.priority.name }}</span>
+                                    <span class="badge{% if task.status.name == 'OPEN' %} bg-primary{% elif task.status.name == 'IN_PROGRESS' %} bg-warning{% else %} bg-success{% endif %}">{{ task.status.name }}</span>
+                                    {% if task.due_date %}
+                                    <small class="text-muted d-block">Fällig: {{ task.due_date.strftime('%Y-%m-%d %H:%M') }}</small>
+                                    {% endif %}
+                                </div>
                             </div>
                             <div class="text-end">
                                 <form method="POST" action="{{ url_for('main.change_status', task_id=task.id) }}" class="d-inline">
