@@ -75,7 +75,15 @@
                         </form>
                         <p class="mt-2 mb-1">{{ task.description }}</p>
                         <span class="badge bg-secondary">{{ task.priority }}</span>
-                        <span class="badge{% if task.status == 'OPEN' %} bg-primary{% elif task.status == 'IN_PROGRESS' %} bg-warning{% else %} bg-success{% endif %}">{{ task.status }}</span>
+                                <option value="OPEN" {% if task.status.name == 'OPEN' %}selected{% endif %}>OPEN</option>
+                                <option value="IN_PROGRESS" {% if task.status.name == 'IN_PROGRESS' %}selected{% endif %}>IN_PROGRESS</option>
+                                <option value="COMPLETED" {% if task.status.name == 'COMPLETED' %}selected{% endif %}>COMPLETED</option>
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-secondary">Status</button>
+                        </form>
+                        <p class="mt-2 mb-1">{{ task.description }}</p>
+                        <span class="badge bg-secondary">{{ task.priority }}</span>
+                        <span class="badge{% if task.status.name == 'OPEN' %} bg-primary{% elif task.status.name == 'IN_PROGRESS' %} bg-warning{% else %} bg-success{% endif %}">{{ task.status.name }}</span>
                         <a href="{{ url_for('main.send_reminder', task_id=task.id) }}" class="btn btn-sm btn-info">Erinnerung</a>
                     </li>
                     {% else %}
