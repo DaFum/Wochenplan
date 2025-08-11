@@ -78,38 +78,6 @@ class BasicTestCase(unittest.TestCase):
         resp = self.client.post(f'/task/{tid}/delete')
         self.assertEqual(resp.status_code, 302)
         with self.app.app_context():
-    def test_edit_task(self):
-        """Prüft, ob das Bearbeiten einer Aufgabe funktioniert."""
-        with self.app.app_context():
-            task = current_app.task_manager.add_task('Alt')
-            tid = task.id
-        resp = self.client.post(f'/task/{tid}/edit', data={'title': 'Neu'})
-        self.assertEqual(resp.status_code, 302)
-        with self.app.app_context():
-            updated = current_app.task_manager.get_task(tid)
-            self.assertEqual(updated.title, 'Neu')
-
-    def test_change_status(self):
-        """Prüft, ob das Ändern des Status einer Aufgabe funktioniert."""
-        with self.app.app_context():
-            task = current_app.task_manager.add_task('Status')
-            tid = task.id
-        resp = self.client.post(f'/task/{tid}/status', data={'status': 'COMPLETED'})
-        self.assertEqual(resp.status_code, 302)
-        with self.app.app_context():
-            updated = current_app.task_manager.get_task(tid)
-            self.assertEqual(updated.status, 'COMPLETED')
-
-    def test_delete_task(self):
-        """Prüft, ob das Löschen einer Aufgabe funktioniert."""
-        with self.app.app_context():
-            task = current_app.task_manager.add_task('Loeschen')
-            tid = task.id
-        resp = self.client.post(f'/task/{tid}/delete')
-        self.assertEqual(resp.status_code, 302)
-        with self.app.app_context():
-            self.assertIsNone(current_app.task_manager.get_task(tid))
-
 
 if __name__ == '__main__':
     unittest.main()
