@@ -19,18 +19,18 @@
         <ul class="list-group">
             {% for subject in subjects %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span>{{ subject }}</span>
+                <span>{{ subject.name }}</span>
                 <form method="POST" action="{{ url_for('main.settings') }}" class="m-0">
                     <input type="hidden" name="action" value="remove">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
--                   <input type="hidden" name="subject" value="{{ subject }}">
-+                   <input type="hidden" name="subject_id" value="{{ subject.id }}">
-+                   <input type="hidden" name="subject_name" value="{{ subject.name }}">
--                   <button type="submit" class="btn btn-sm btn-danger">Entfernen</button>
-+                   <button type="submit" class="btn btn-sm btn-danger"
-+                           onclick="return confirm('Fach „{{ subject }}“ wirklich entfernen?')">
-+                       Entfernen
-+                   </button>
+                    <input type="hidden" name="subject_id" value="{{ subject.id }}">
+                    <input type="hidden" name="subject_name" value="{{ subject.name }}">
+                    <button type="submit" class="btn btn-sm btn-danger"
+                            onclick="return confirm('Fach „{{ subject.name }}\" wirklich entfernen?')">
+                        Entfernen
+                    </button>
+                </form>
+            </li>
                 </form>
             </li>
             {% endfor %}
