@@ -149,7 +149,7 @@ def settings():
             
             # Create a remove form for each subject with CSRF protection
             remove_form = RemoveSubjectForm()
-            remove_form.subject.data = s
+            remove_form = make_remove_form(s)
             
             subject_items.append({
                 'name': s, 
