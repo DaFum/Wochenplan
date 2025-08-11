@@ -122,7 +122,25 @@ def settings():
             flash("Fehler beim Verwalten der Fächer.", "error")
         return redirect(url_for('main.settings'))
 
-    try:
+                try:
+                    filename = secure_filename(f"{subject}.png")
+                    folder = os.path.join(current_app.static_folder, 'subjects')
+                    os.makedirs(folder, exist_ok=True)
+                    path = os.path.join(folder, filename)
+                    with PollinationsImage() as img_client:
+                        img_client(
+                            prompt=f"school subject {subject} icon",
+                            save=True,
+                            file=path,
+                            width=256,
+                            height=256,
+                        )
+                    flash(f"Fach '{subject}' hinzugefügt.", "success")
+                except Exception as img_err:
+                    logger.error(f"Image generation failed for subject {subject}: {img_err}")
+                    flash(f"Fach '{subject}' hinzugefügt, aber das Icon konnte nicht generiert werden.", "warning")
+            else:
+                flash("Fach konnte nicht hinzugefügt werden.", "error")
         subjects = current_app.content_library.get_subjects()
         subject_items = []
         for s in subjects:
