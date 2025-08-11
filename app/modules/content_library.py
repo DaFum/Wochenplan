@@ -50,6 +50,16 @@ class ContentLibrary:
         """
         return self._SUBJECTS
 
+    def add_subject(self, subject: str) -> None:
+        """Fügt der Bibliothek ein neues Fach hinzu."""
+        if subject and subject not in self._SUBJECTS:
+            self._SUBJECTS.append(subject)
+
+    def remove_subject(self, subject: str) -> None:
+        """Entfernt ein Fach aus der Bibliothek, falls vorhanden."""
+        if subject in self._SUBJECTS:
+            self._SUBJECTS.remove(subject)
+
     def get_tasks_for_subject(self, subject: str) -> List[str]:
         """
         Gibt eine kombinierte Liste vordefinierter Aufgaben für das angegebene Fach zurück.

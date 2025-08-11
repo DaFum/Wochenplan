@@ -72,4 +72,22 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
+    // Drag-and-drop reordering for tasks
+    const taskList = document.getElementById('taskList');
+    if (taskList && typeof Sortable !== 'undefined') {
+        new Sortable(taskList, {
+            animation: 150,
+            onEnd: () => {
+                Array.from(taskList.children).forEach((el, index) => {
+                    const id = el.getAttribute('data-id');
+                    fetch(`/task/${id}/reorder`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ position: index })
+                    });
+                });
+            }
+        });
+    }
 });

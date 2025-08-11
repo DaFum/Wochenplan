@@ -1,12 +1,21 @@
 import logging
 from datetime import datetime, timedelta
 
-from flask import (Blueprint, flash, redirect, render_template, request,
-                   session, url_for, current_app)
+from flask import (
+    Blueprint,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+    current_app,
+)
 
 from pollinations.text import Text
 
 from .forms import PlannerForm
+from app.modules.task_manager import TaskStatus
 
 
 logger = logging.getLogger(__name__)
@@ -50,15 +59,70 @@ def home():
     )
 
 
-@main_bp.route('/einstellungen', methods=['GET'])
+@main_bp.route('/einstellungen', methods=['GET', 'POST'])
 def settings():
     """
-    Rendert die Einstellungsseite mit einer Liste verfügbarer Lernfächer.
-    
-    Gibt das Template 'settings.html' mit den abgerufenen Fächern zurück.
+    Rendert die Einstellungsseite und ermöglicht das Hinzufügen oder Entfernen von Fächern.
     """
+    if request.method == 'POST':
+        action = request.form.get('action')
+        subject = request.form.get('subject')
+        if action == 'add' and subject:
+            current_app.content_library.add_subject(subject)
+        elif action == 'remove' and subject:
+            current_app.content_library.remove_subject(subject)
+        return redirect(url_for('main.settings'))
+
     subjects = current_app.content_library.get_subjects()
     return render_template('settings.html', subjects=subjects)
+
+
+@main_bp.route('/task/<task_id>/reorder', methods=['POST'])
+def reorder_task(task_id):
+    """Aktualisiert die Reihenfolge der Aufgaben."""
+    new_position = request.json.get('position')
+    if new_position is None:
+        return {'error': 'Position missing'}, 400
+    if current_app.task_manager.reorder_task(task_id, int(new_position)):
+        return {'status': 'ok'}
+    return {'error': 'Task not found'}, 404
+
+
+@main_bp.route('/task/<task_id>/update', methods=['POST'])
+def update_task(task_id):
+    """Aktualisiert Titel oder Beschreibung einer Aufgabe."""
+    title = request.form.get('title')
+    description = request.form.get('description')
+    if current_app.task_manager.update_task(task_id, title=title, description=description):
+        flash("Aufgabe aktualisiert.", "success")
+    else:
+        flash("Aufgabe nicht gefunden.", "error")
+    return redirect(url_for('main.home'))
+
+
+@main_bp.route('/task/<task_id>/delete', methods=['POST'])
+def delete_task(task_id):
+    """Löscht eine Aufgabe."""
+    if current_app.task_manager.delete_task(task_id):
+        flash("Aufgabe gelöscht.", "success")
+    else:
+        flash("Aufgabe nicht gefunden.", "error")
+    return redirect(url_for('main.home'))
+
+
+@main_bp.route('/task/<task_id>/status', methods=['POST'])
+def change_status(task_id):
+    """Ändert den Status einer Aufgabe."""
+    status_name = request.form.get('status')
+    try:
+        status = TaskStatus[status_name]
+    except KeyError:
+        return {'error': 'Invalid status'}, 400
+    if current_app.task_manager.update_task_status(task_id, status):
+        flash("Status aktualisiert.", "success")
+    else:
+        flash("Aufgabe nicht gefunden.", "error")
+    return redirect(url_for('main.home'))
 
 
 @main_bp.route('/send-reminder/<task_id>')

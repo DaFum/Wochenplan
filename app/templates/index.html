@@ -52,18 +52,30 @@
                 <h5 class="mb-0">Aufgabenliste</h5>
             </div>
             <div class="card-body">
-                <ul class="list-group">
+                <ul class="list-group" id="taskList">
                     {% for task in tasks %}
-                    <li class="list-group-item">
-                        <h5>{{ task.title }}</h5>
-                        <p>{{ task.description }}</p>
-                        <span class="badge bg-secondary">{{ task.priority.name }}</span>
-                        <span class="badge
-                            {% if task.status.name == 'OPEN' %} bg-primary
-                            {% elif task.status.name == 'IN_PROGRESS' %} bg-warning
-                            {% else %} bg-success
-                            {% endif %}
-                        ">{{ task.status.name }}</span>
+                    <li class="list-group-item" data-id="{{ task.id }}">
+                        <form method="POST" action="{{ url_for('main.update_task', task_id=task.id) }}" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="text" name="title" value="{{ task.title }}" class="form-control d-inline w-auto">
+                            <button type="submit" class="btn btn-sm btn-primary">Speichern</button>
+                        </form>
+                        <form method="POST" action="{{ url_for('main.delete_task', task_id=task.id) }}" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-danger">Löschen</button>
+                        </form>
+                        <form method="POST" action="{{ url_for('main.change_status', task_id=task.id) }}" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <select name="status" class="form-select form-select-sm d-inline w-auto">
+                                <option value="OPEN" {% if task.status == 'OPEN' %}selected{% endif %}>OPEN</option>
+                                <option value="IN_PROGRESS" {% if task.status == 'IN_PROGRESS' %}selected{% endif %}>IN_PROGRESS</option>
+                                <option value="COMPLETED" {% if task.status == 'COMPLETED' %}selected{% endif %}>COMPLETED</option>
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-secondary">Status</button>
+                        </form>
+                        <p class="mt-2 mb-1">{{ task.description }}</p>
+                        <span class="badge bg-secondary">{{ task.priority }}</span>
+                        <span class="badge{% if task.status == 'OPEN' %} bg-primary{% elif task.status == 'IN_PROGRESS' %} bg-warning{% else %} bg-success{% endif %}">{{ task.status }}</span>
                         <a href="{{ url_for('main.send_reminder', task_id=task.id) }}" class="btn btn-sm btn-info">Erinnerung</a>
                     </li>
                     {% else %}
@@ -96,6 +108,7 @@
     </div>
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/gsap.min.js" integrity="sha384-EXoMlsRz5LeM9I+svMr9NrSRlZc4GWlywJ430KvHETR8/bMX6mTyTLWdE/8GLWOF" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js" integrity="sha512-hlZpdmn3d5tne342XQI3/OQvPsvBLmvBxGZ+rsoAhH4m6q+UpBAkLTlaX2UjsFvdcGaVbL50DJBSSTXobHxPPg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
