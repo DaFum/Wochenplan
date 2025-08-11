@@ -133,11 +133,10 @@ class BasicTestCase(unittest.TestCase):
     def test_task_has_dynamic_image_url(self):
         """Aufgaben erhalten eine dynamische Pollinations-Bild-URL."""
         with self.app.app_context():
-            task = self.app.task_manager.add_task('Hausaufgabe')
+            self.app.task_manager.add_task('Hausaufgabe')
         resp = self.client.get('/')
         expected = f"image.pollinations.ai/prompt/{quote('Hausaufgabe')}"
         self.assertIn(expected, resp.get_data(as_text=True))
-
     def test_library_tasks_endpoint(self):
         """Content library tasks are exposed via API."""
         resp = self.client.get('/api/library-tasks/Mathematik')
