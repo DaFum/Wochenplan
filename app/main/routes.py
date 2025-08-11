@@ -36,7 +36,7 @@ def home():
     try:
         subjects = current_app.content_library.get_subjects()
         form.learning_subject.choices = subjects
-    except Exception as e:
+    except AttributeError as e:
         logger.error(f"Failed to load subjects: {e}")
         subjects = []
         form.learning_subject.choices = []
