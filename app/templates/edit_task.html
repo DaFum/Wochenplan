@@ -11,9 +11,9 @@
     <div class="container mt-5">
         <h1>Aufgabe bearbeiten</h1>
         <form method="POST" action="{{ url_for('main.edit_task', task_id=task.id) }}">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div class="mb-3">
-                <label for="title" class="form-label">Titel</label>
+                    <label for="title" class="form-label">Titel</label>
+                    <input type="text" id="title" name="title" class="form-control" value="{{ task.title }}" required>
+                </div>
                 <input type="text" id="title" name="title" class="form-control" value="{{ task.title }}">
             </div>
             <div class="mb-3">
