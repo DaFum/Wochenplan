@@ -86,7 +86,25 @@ document.addEventListener('DOMContentLoaded', function() {
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ position: index })
                     });
+                // Store previous order in case we need to revert
+                const prevOrder = Array.from(taskList.children).map(el => el);
+                const fetches = Array.from(taskList.children).map((el, index) => {
+                    const id = el.getAttribute('data-id');
+                    return fetch(`/task/${id}/reorder`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ position: index })
+                    });
                 });
+                Promise.all(fetches.map(p => p.catch(e => e)))
+                    .then(results => {
+                        const hasError = results.some(r => r instanceof Error || (r && !r.ok));
+                        if (hasError) {
+                            // Revert UI to previous order
+                            prevOrder.forEach(el => taskList.appendChild(el));
+                            alert('Failed to reorder tasks. Please try again.');
+                        }
+                    });
             }
         });
     }
