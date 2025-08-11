@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aufgabe bearbeiten</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Aufgabe bearbeiten</h1>
+        <form method="POST" action="{{ url_for('main.edit_task', task_id=task.id) }}">
+                    <label for="title" class="form-label">Titel</label>
+                    <input type="text" id="title" name="title" class="form-control" value="{{ task.title }}" required>
+                </div>
+                <input type="text" id="title" name="title" class="form-control" value="{{ task.title }}">
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Beschreibung</label>
+                <textarea id="description" name="description" class="form-control" rows="3">{{ task.description }}</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Speichern</button>
+            <a href="{{ url_for('main.home') }}" class="btn btn-secondary">Abbrechen</a>
+        </form>
+    </div>
+</body>
+</html>

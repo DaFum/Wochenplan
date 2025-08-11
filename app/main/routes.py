@@ -54,6 +54,7 @@ def home():
         'index.html',
         tasks=tasks,
         subjects=current_app.content_library.get_subjects(),
+        days=WEEKDAYS,
         form=form,
         generated_text=generated_text
     )
@@ -99,16 +100,29 @@ def reorder_task(task_id):
     return {'error': 'Task not found'}, 404
 
 
-@main_bp.route('/task/<task_id>/update', methods=['POST'])
-def update_task(task_id):
-    """Aktualisiert Titel oder Beschreibung einer Aufgabe."""
-    title = request.form.get('title')
-    description = request.form.get('description')
-    if current_app.task_manager.update_task(task_id, title=title, description=description):
-        flash("Aufgabe aktualisiert.", "success")
-    else:
+@main_bp.route('/task/<task_id>/edit', methods=['GET', 'POST'])
+def edit_task(task_id):
+    """Zeigt ein Formular zur Bearbeitung einer Aufgabe und speichert Änderungen."""
+    task = current_app.task_manager.get_task(task_id)
+    if not task:
         flash("Aufgabe nicht gefunden.", "error")
-    return redirect(url_for('main.home'))
+        return redirect(url_for('main.home'))
+
+    if request.method == 'POST':
+        title = request.form.get('title', '').strip()
+        description = request.form.get('description')
+
+        if not title:
+            flash("Titel darf nicht leer sein.", "error")
+            return redirect(url_for('main.edit_task', task_id=task_id))
+
+        if current_app.task_manager.update_task(task_id, title=title, description=description):
+            flash("Aufgabe aktualisiert.", "success")
+        else:
+            flash("Aktualisierung fehlgeschlagen.", "error")
+        return redirect(url_for('main.home'))
+
+    return render_template('edit_task.html', task=task)
 
 
 @main_bp.route('/task/<task_id>/delete', methods=['POST'])
