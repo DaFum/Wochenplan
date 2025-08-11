@@ -90,7 +90,10 @@ class Image:
         response.raise_for_status()
         content_type = response.headers.get('content-type', '')
         try:
-            if content_type.startswith('image/') or not content_type:
+            if content_type.startswith('image/'):
+                image = PILImage.open(BytesIO(response.content))
+            elif not content_type:
+                logging.warning("API returned empty content-type, attempting to process as image anyway")
                 image = PILImage.open(BytesIO(response.content))
             else:
                 logging.error("API returned non-image content: %s", response.text)
