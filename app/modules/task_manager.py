@@ -159,10 +159,10 @@ class TaskManager:
             logging.error(f"Aufgabe mit ID {task_id} nicht gefunden.")
             return False
 
-        tasks = Task.query.order_by(Task.order).all()
-        # Remove the task from the list by id to avoid O(n) 'in' check
-        tasks = [t for t in tasks if t.id != task.id]
-        tasks.insert(new_position, task)
+          tasks = Task.query.order_by(Task.order).all()
+          # Remove the task from the list by id to avoid O(n) 'in' check
+          tasks = [t for t in tasks if t.id != task.id]
+          tasks.insert(new_position, task)
         for index, t in enumerate(tasks):
             t.order = index
         db.session.commit()
