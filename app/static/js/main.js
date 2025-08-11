@@ -60,10 +60,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Check for saved dark mode preference
-    if (localStorage.getItem('darkMode') === 'enabled') {
-        document.body.classList.add('dark-mode');
-    }
+// Check for saved dark mode preference immediately
+if (localStorage.getItem('darkMode') === 'enabled') {
+    document.body.classList.add('dark-mode');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // GSAP animations for tab transitions
+    // ... rest of code ...
+});
 
     // Search functionality
     const searchInput = document.getElementById('searchInput');
