@@ -136,4 +136,37 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Task suggestion loading based on subject selection
+    const subjectSelect = document.getElementById('learning_subject');
+    const taskSuggestions = document.getElementById('taskSuggestions');
+    
+    if (subjectSelect && taskSuggestions) {
+        subjectSelect.addEventListener('change', async () => {
+            const selectedSubject = subjectSelect.value;
+            if (!selectedSubject) {
+                taskSuggestions.innerHTML = '';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/library-tasks/${encodeURIComponent(selectedSubject)}`);
+                const data = await response.json();
+                
+                // Clear existing suggestions
+                taskSuggestions.innerHTML = '';
+                
+                // Add new suggestions
+                if (data.tasks && Array.isArray(data.tasks)) {
+                    data.tasks.forEach(task => {
+                        const option = document.createElement('option');
+                        option.value = task;
+                        taskSuggestions.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to load task suggestions:', error);
+            }
+        });
+    }
 });
