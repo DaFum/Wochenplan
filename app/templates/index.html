@@ -74,7 +74,6 @@
                             <button type="submit" class="btn btn-sm btn-secondary">Status</button>
                         </form>
                         <p class="mt-2 mb-1">{{ task.description }}</p>
-                        <span class="badge bg-secondary">{{ task.priority }}</span>
                                 <option value="OPEN" {% if task.status.name == 'OPEN' %}selected{% endif %}>OPEN</option>
                                 <option value="IN_PROGRESS" {% if task.status.name == 'IN_PROGRESS' %}selected{% endif %}>IN_PROGRESS</option>
                                 <option value="COMPLETED" {% if task.status.name == 'COMPLETED' %}selected{% endif %}>COMPLETED</option>
