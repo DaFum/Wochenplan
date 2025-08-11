@@ -88,23 +88,22 @@ class Image:
         params.update(kwargs)
         response = self._sync_client.get(self._build_url(prompt), params=params)
         response.raise_for_status()
-        content_type = response.headers.get('content-type', '')
+        content_type = response.headers.get("content-type", "")
+
+        if not content_type:
+            logging.warning(
+                "API returned empty content-type, attempting to process as image anyway"
+            )
+        elif not content_type.startswith("image/"):
+            logging.error("API returned non-image content: %s", response.text)
+            raise RuntimeError("API returned non-image content.")
+
         try:
-            if content_type.startswith('image/') or not content_type:
-                if not content_type:
-                    logging.warning("API returned empty content-type, attempting to process as image anyway")
-                image = PILImage.open(BytesIO(response.content))
-                logging.warning("API returned empty content-type, attempting to process as image anyway")
-                image = PILImage.open(BytesIO(response.content))
-            elif content_type.startswith('image/'):
-            if content_type.startswith('image/') or not content_type:
-                if not content_type:
-                    logging.warning("API returned empty content-type, attempting to process as image anyway")
-                image = PILImage.open(BytesIO(response.content))
-            else:
-                logging.error("API returned non-image content: %s", response.text)
-                raise RuntimeError("API returned non-image content.")
-        except (UnidentifiedImageError, OSError) as e:
+            image = PILImage.open(BytesIO(response.content))
+        except UnidentifiedImageError:
+            logging.error("Failed to process response content as an image")
+            raise RuntimeError("Content could not be processed as an image.")
+        except OSError as e:
             raise RuntimeError(f"Failed to decode image: {e}") from e
         if save and file:
             try:
