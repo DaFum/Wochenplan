@@ -109,8 +109,13 @@ def edit_task(task_id):
         return redirect(url_for('main.home'))
 
     if request.method == 'POST':
-        title = request.form.get('title')
+        title = request.form.get('title', '').strip()
         description = request.form.get('description')
+
+        if not title:
+            flash("Titel darf nicht leer sein.", "error")
+            return redirect(url_for('main.edit_task', task_id=task_id))
+
         if current_app.task_manager.update_task(task_id, title=title, description=description):
             flash("Aufgabe aktualisiert.", "success")
         else:
