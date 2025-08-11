@@ -117,7 +117,8 @@ def change_status(task_id):
     try:
         status = TaskStatus[status_name]
     except KeyError:
-        return {'error': 'Invalid status'}, 400
+        flash("Ungültiger Status.", "error")
+        return redirect(url_for('main.home'))
     if current_app.task_manager.update_task_status(task_id, status):
         flash("Status aktualisiert.", "success")
     else:
