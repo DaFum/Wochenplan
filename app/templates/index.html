@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Wochenplan</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" integrity="sha384-Gu3KVV2H9d+yA4QDpVB7VcOyhJlAVrcXd0thEjr4KznfaFPLe0xQJyonVxONa4ZC" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="header">
+            <h1>Wochenplan</h1>
+            <div>
+                <a href="{{ url_for('main.settings') }}" class="btn btn-light" title="Zur Einstellungsseite wechseln">Einstellungen</a>
+                <a href="{{ url_for('exports.download_ical') }}" class="btn">iCal-Export</a>
+            </div>
+        </div>
+        <button id="darkModeToggle" class="btn btn-secondary mt-3" title="Schaltet den Dunkelmodus um, ohne die Seite neu zu laden">Dunkelmodus umschalten</button>
+        <input type="text" id="searchInput" class="form-control mt-3" placeholder="Suche nach Fach oder Material">
+        <ul class="nav nav-tabs" id="weekdaysTabs" role="tablist">
+            {% for day in days %}
+            <li class="nav-item" role="presentation">
+                <a class="nav-link {{ 'active' if loop.first else '' }}" id="{{ day }}-tab" data-bs-toggle="tab" href="#{{ day }}" role="tab" aria-controls="{{ day }}" aria-selected="{{ 'true' if loop.first else 'false' }}">{{ day }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">Neue Aufgabe hinzufügen</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('main.home') }}" id="task-form">
+                    {{ form.hidden_tag() }}
+                    <input type="hidden" name="form_context" value="add_task">
+                    <div class="mb-3">
+                        {{ form.learning_subject.label(class="form-label") }}
+                        {{ form.learning_subject(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.learning_task.label(class="form-label") }}
+                        {{ form.learning_task(class="form-control") }}
+                    </div>
+                    {{ form.submit(class="btn btn-primary", title="Speichert die Aufgabe, zeigt eine Bestätigung und lädt die Seite neu") }}
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">Aufgabenliste</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group" id="taskList">
+                    {% for task in tasks %}
+                    <li class="list-group-item" data-id="{{ task.id }}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h5 class="mb-1">{{ task.title }}</h5>
+                                <p class="mb-1">{{ task.description }}</p>
+                                <span class="badge bg-secondary">{{ task.priority }}</span>
+                                <span class="badge{% if task.status.name == 'OPEN' %} bg-primary{% elif task.status.name == 'IN_PROGRESS' %} bg-warning{% else %} bg-success{% endif %}">{{ task.status.name }}</span>
+                            </div>
+                            <div class="text-end">
+                                <form method="POST" action="{{ url_for('main.change_status', task_id=task.id) }}" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <select name="status" class="form-select form-select-sm d-inline w-auto">
+                                        <option value="OPEN" {% if task.status.name == 'OPEN' %}selected{% endif %}>OPEN</option>
+                                        <option value="IN_PROGRESS" {% if task.status.name == 'IN_PROGRESS' %}selected{% endif %}>IN_PROGRESS</option>
+                                        <option value="COMPLETED" {% if task.status.name == 'COMPLETED' %}selected{% endif %}>COMPLETED</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-secondary">Status</button>
+                                </form>
+                                <a href="{{ url_for('main.edit_task', task_id=task.id) }}" class="btn btn-sm btn-primary">Bearbeiten</a>
+                                <form method="POST" action="{{ url_for('main.delete_task', task_id=task.id) }}" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-danger">Löschen</button>
+                                </form>
+                                <a href="{{ url_for('main.send_reminder', task_id=task.id) }}" class="btn btn-sm btn-info">Erinnerung</a>
+                            </div>
+                        </div>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item">Keine Aufgaben gefunden.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">KI-Textgenerator</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('main.generate_text') }}" id="textGenForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="prompt" class="form-label">Prompt</label>
+                        <textarea class="form-control" id="prompt" name="prompt" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" title="Generiert Text ohne die Seite neu zu laden">Text generieren</button>
+                </form>
+                <div id="generatedTextContainer" class="mt-3" {% if not generated_text %}style="display:none;"{% endif %}>
+                    <h6>Generierter Text:</h6>
+                    <p id="generatedText">{% if generated_text %}{{ generated_text }}{% endif %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/gsap.min.js" integrity="sha384-EXoMlsRz5LeM9I+svMr9NrSRlZc4GWlywJ430KvHETR8/bMX6mTyTLWdE/8GLWOF" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js" integrity="sha512-Eezs+g9Lq4TCCq0wae01s9PuNWzHYoCMkE97e2qdkYthpI0pzC3UGB03lgEHn2XM85hDOUF6qgqqszs+iXU4UA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

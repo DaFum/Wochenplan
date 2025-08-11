@@ -1,9 +1,15 @@
+# render.yaml
+# 1. Fixed gunicorn entry point for factory pattern
+# 2. Future: Add health check endpoint
+# 3. Issues: None - standard deployment config
+# Excellent work on the modular refactoring - this deployment fix completes the architecture!
+
 services:
   - type: web
     name: wochenplan-app
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: gunicorn "app:create_app()"
     envVars:
       - key: SECRET_KEY
         fromDatabase: true

@@ -1,43 +1,70 @@
-# Wochenplan App
-Die Wochenplan App ist eine einfache Anwendung, die es Benutzern ermöglicht, ihre wöchentlichen Aufgaben und Lerninhalte zu planen und zu verwalten. Die App verwendet Flask für das Backend, SQLAlchemy für die Datenbankverwaltung und Flask-WTF für die Formulare. Das Frontend ist mit HTML und CSS gestaltet.
+# Wochenplan Production Readiness Roadmap
 
-## Features
-Aufgabenplanung: Benutzer können tägliche Aufgaben und Lerninhalte für die Woche eingeben und speichern.
-PDF-Download: Exportiere deine Wochenplanung als PDF.
-Responsives Design: Benutzerfreundliche Oberfläche, die auf verschiedenen Geräten gut aussieht.
-Dunkelmodus: Umschalten zwischen hellem und dunklem Modus für eine angenehme Nutzung bei unterschiedlichen Lichtverhältnissen.
-Installation
-## Repository klonen:
+This document outlines the steps taken to make the Wochenplan application production-ready.
 
-```
+## Setup and Installation
+
+1.  **Clone the repository:**
+    ```bash
 git clone https://github.com/DaFum/Wochenplan.git
-cd Wochenplan
-```
-Virtuelle Umgebung erstellen:
-```
-python3 -m venv venv
-source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-```
-Abhängigkeiten installieren:
-```
-pip install -r requirements.txt
-```
-Datenbank konfigurieren:
+    cd wochenplan
+    ```
 
-Setze die Umgebungsvariable DATABASE_URI oder nutze die voreingestellte SQLite-Datenbank.
+2.  **Create and activate a virtual environment:**
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
 
-Anwendung starten:
-```
-flask run
-```
+3.  **Install the dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-## Nutzung
-Startseite: Auf der Startseite können Benutzer ihre Aufgaben und Lerninhalte für jeden Tag der Woche eingeben.
-Aufgaben speichern: Nach dem Ausfüllen der Formulare können die Daten gespeichert werden.
-PDF herunterladen: Die Wochenplanung kann als PDF-Datei heruntergeladen werden.
-## Ordnerstruktur
-app.py: Hauptanwendung und Routen.
-static/styles.css: Stile für die Benutzeroberfläche.
-templates/: index.html für die Seite.
-### Lizenz
-Dieses Projekt steht unter der MIT-Lizenz.
+4.  **Set up the environment variables:**
+    -   Copy the `.env.example` file to `.env`:
+        ```bash
+        cp .env.example .env
+        ```
+    -   Edit the `.env` file and add the required environment variables:
+        -   `SECRET_KEY`: A strong, random secret key.
+        -   `DATABASE_URI`: The URI for the database.
+        -   `POLLINATIONS_API_KEY`: Your API key for Pollinations.
+
+5.  **Run the database migrations:**
+    ```bash
+    flask db upgrade
+    ```
+
+6.  **Seed the database with initial data:**
+    ```bash
+    python seed.py
+    ```
+
+## Running the Application
+
+-   **Development:**
+    ```bash
+    flask run
+    ```
+
+-   **Production:**
+    ```bash
+    export FLASK_ENV=production
+    gunicorn -w 4 -b 0.0.0.0:$PORT run:app
+    ```
+
+## Testing
+
+-   Run the tests with the following command:
+    ```bash
+    python -m unittest discover -s tests
+    ```
+
+## Linting and Static Analysis
+
+-   Run `flake8` and `bandit` to check for code quality and security issues:
+    ```bash
+    flake8 .
+    bandit -r .
+    ```

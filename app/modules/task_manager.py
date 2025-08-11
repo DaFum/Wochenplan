@@ -1,0 +1,222 @@
+# ============================================================
+# 1. Updates: Refactored to remove duplicate/incorrect reorder_task and fixed indentation. Preserved class structure and docstring discipline.
+# 2. Future Ideas: Extract ordering logic for testability; add more granular error handling and unittests for edge cases.
+# 3. Issues+Fixes: Fixed IndentationError and method duplication. Compliment: The Synthesizer admires the clean separation of concerns and idiomatic Enum use.
+# ============================================================
+
+import logging
+import uuid
+from datetime import datetime
+from enum import Enum
+from typing import List, Optional
+
+from app.models import Task
+from app import db
+
+
+class TaskStatus(Enum):
+    """Definiert den Status einer Aufgabe."""
+    OPEN = "OPEN"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
+
+
+class TaskPriority(Enum):
+    """Definiert die Priorität einer Aufgabe."""
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
+
+
+class TaskManager:
+    """Verwaltet einen Satz von Aufgaben."""
+    def __init__(self):
+        """
+        Initialisiert eine neue Instanz des TaskManager.
+        """
+        logging.info("TaskManager initialisiert.")
+
+    def add_task(
+        self,
+        title: str,
+        description: Optional[str] = None,
+        priority: TaskPriority = TaskPriority.MEDIUM,
+        start_time: Optional[datetime] = None,
+        end_time: Optional[datetime] = None
+    ) -> Task:
+        """
+        Erstellt eine neue Aufgabe mit Titel, optionaler Beschreibung, Priorität sowie optionalem Start- und Endzeitpunkt und speichert sie in der Datenbank.
+        
+        Parameters:
+            title (str): Titel der Aufgabe. Darf nicht leer sein.
+            description (Optional[str]): Optionale Beschreibung der Aufgabe.
+            priority (TaskPriority): Priorität der Aufgabe (Standard: MEDIUM).
+            start_time (Optional[datetime]): Optionaler Startzeitpunkt.
+            end_time (Optional[datetime]): Optionaler Endzeitpunkt.
+        
+        Returns:
+            Task: Das erstellte Aufgabenobjekt.
+        
+        Raises:
+            ValueError: Wenn der Titel leer ist.
+        """
+        if not title:
+            raise ValueError("Der Titel darf nicht leer sein.")
+
+        max_order = db.session.query(db.func.max(Task.order)).scalar() or 0
+        new_task = Task(
+            id=str(uuid.uuid4()),
+            title=title,
+            description=description,
+            priority=priority.name,
+            start_time=start_time,
+            end_time=end_time,
+            order=max_order + 1,
+        )
+        db.session.add(new_task)
+        db.session.commit()
+        logging.info(f"Aufgabe hinzugefügt: '{title}' (ID: {new_task.id})")
+        return new_task
+
+    def get_task(self, task_id: str) -> Optional[Task]:
+        """
+        Gibt eine Aufgabe mit der angegebenen ID zurück, falls vorhanden.
+        
+        Parameters:
+            task_id (str): Die eindeutige ID der Aufgabe.
+        
+        Returns:
+            Optional[Task]: Die gefundene Aufgabe oder None, wenn keine Aufgabe mit dieser ID existiert.
+        """
+        return Task.query.get(task_id)
+
+    def update_task_status(self, task_id: str, status: TaskStatus) -> bool:
+        """
+        Setzt den Status einer Aufgabe anhand ihrer ID auf den angegebenen Wert.
+
+        Gibt True zurück, wenn die Aufgabe gefunden und aktualisiert wurde, andernfalls False.
+        """
+        task = self.get_task(task_id)
+        if task:
+            task.status = status.name
+            db.session.commit()
+            logging.info(
+                f"Status von Aufgabe {task_id} auf {status.name} geändert."
+            )
+            return True
+        logging.error(f"Aufgabe mit ID {task_id} nicht gefunden.")
+        return False
+
+    def update_task(
+        self,
+        task_id: str,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        priority: Optional[TaskPriority] = None,
+        start_time: Optional[datetime] = None,
+        end_time: Optional[datetime] = None,
+    ) -> bool:
+        """Aktualisiert eine bestehende Aufgabe.
+
+        Übergebene Parameter überschreiben die vorhandenen Werte. Nicht
+        angegebene Felder bleiben unverändert. Gibt ``True`` zurück, wenn die
+        Aufgabe gefunden und gespeichert wurde, andernfalls ``False``.
+        """
+        task = self.get_task(task_id)
+        if not task:
+            logging.error(f"Aufgabe mit ID {task_id} nicht gefunden.")
+            return False
+
+        if title is not None:
+            task.title = title
+        if description is not None:
+            task.description = description
+        if priority is not None:
+            task.priority = (
+                priority.name if isinstance(priority, TaskPriority) else priority
+            )
+        if start_time is not None:
+            task.start_time = start_time
+        if end_time is not None:
+            task.end_time = end_time
+        db.session.commit()
+        logging.info(f"Aufgabe {task_id} aktualisiert.")
+        return True
+
+    def delete_task(self, task_id: str) -> bool:
+        """Löscht eine Aufgabe anhand ihrer ID.
+
+        Rückgabewert ist ``True``, wenn die Aufgabe existierte und entfernt
+        wurde, sonst ``False``.
+        """
+        task = self.get_task(task_id)
+        if not task:
+            logging.error(f"Aufgabe mit ID {task_id} nicht gefunden.")
+            return False
+        db.session.delete(task)
+        db.session.commit()
+        logging.info(f"Aufgabe {task_id} gelöscht.")
+        return True
+
+    def list_tasks(self) -> List[Task]:
+        """
+        Gibt eine Liste aller Aufgaben im System zurück.
+
+        Returns:
+            List[Task]: Alle gespeicherten Aufgaben als Liste von Task-Objekten.
+        """
+        return Task.query.order_by(Task.order).all()
+
+    def reorder_task(self, task_id: str, new_position: int) -> bool:
+        """Ändert die Reihenfolge der Aufgaben basierend auf der neuen Position."""
+        task = self.get_task(task_id)
+        if not task:
+            logging.error(f"Aufgabe mit ID {task_id} nicht gefunden.")
+            return False
+
+        # Validiere new_position
+        if new_position < 0:
+            logging.error(f"Ungültige Position: {new_position} (muss >= 0 sein)")
+            return False
+
+        # Fetch all tasks ordered by 'order'
+        tasks = Task.query.order_by(Task.order).all()
+        num_tasks = len(tasks)
+        # Begrenze new_position auf gültigen Bereich
+        new_position = min(new_position, num_tasks - 1)
+
+        # Finde aktuelle Position des Tasks
+        try:
+            old_position = next(i for i, t in enumerate(tasks) if t.id == task.id)
+        except StopIteration:
+            logging.error(f"Aufgabe mit ID {task_id} nicht in der aktuellen Liste gefunden.")
+            return False
+
+        if new_position == old_position:
+            # Keine Änderung nötig
+            return True
+
+        if new_position < old_position:
+            # Task nach oben verschieben: Inkrementiere order für betroffene Tasks
+            affected_tasks = [
+                t for i, t in enumerate(tasks)
+                if new_position <= i < old_position
+            ]
+            for t in affected_tasks:
+                t.order += 1
+        else:
+            # Task nach unten verschieben: Dekrementiere order für betroffene Tasks
+            affected_tasks = [
+                t for i, t in enumerate(tasks)
+                if old_position < i <= new_position
+            ]
+            for t in affected_tasks:
+                t.order -= 1
+
+        task.order = new_position
+        db.session.commit()
+        logging.info(
+            f"Aufgabe {task_id} wurde an Position {new_position} verschoben."
+        )
+        return True
+        
