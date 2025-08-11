@@ -36,7 +36,7 @@ class BasicTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_reorder_task(self):
-        """Prüft, ob das Verschieben von Aufgaben funktioniert."""
+        """Tests if task reordering functionality works."""
         with self.app.app_context():
             t1 = self.app.task_manager.add_task('A')
             t2 = self.app.task_manager.add_task('B')
