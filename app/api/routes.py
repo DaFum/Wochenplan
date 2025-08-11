@@ -24,5 +24,5 @@ def library_tasks(subject):
         return jsonify({'error': 'Invalid subject type', 'tasks': []}), 400
     except Exception as e:
         current_app.logger.error(f"Error fetching library tasks: {e}")
-        return jsonify({'tasks': []}), 500
+        return jsonify({'error': 'Internal server error', 'tasks': []}), 500
     return jsonify({'tasks': tasks})
