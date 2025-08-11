@@ -24,10 +24,14 @@ def upgrade():
         )
 
     # Set a default order for existing rows
+    task_table = sa.table('task', sa.column('order', sa.Integer()))
+    op.execute(
+        task_table.update().values(order=0).where(task_table.c.order.is_(None))
+    )
 
     # Now make the column non-nullable
     with op.batch_alter_table('task', schema=None) as batch_op:
-        batch_op.alter_column('order', nullable=False)
+        batch_op.alter_column('order', existing_type=sa.Integer(), nullable=False)
     # ### end Alembic commands ###
 
 
