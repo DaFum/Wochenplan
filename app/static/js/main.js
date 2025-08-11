@@ -85,7 +85,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ position: index })
-                    });
                 // Store previous order in case we need to revert
                 const prevOrder = Array.from(taskList.children).map(el => el);
                 const fetches = Array.from(taskList.children).map((el, index) => {
