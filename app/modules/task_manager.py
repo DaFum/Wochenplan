@@ -111,7 +111,8 @@ class TaskManager:
         if description is not None:
             task.description = description
         if priority is not None:
-            task.priority = priority
+        if priority is not None:
+            task.priority = priority.name
         if due_date is not None:
             task.due_date = due_date
         db.session.commit()
