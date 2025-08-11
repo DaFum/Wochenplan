@@ -12,6 +12,7 @@ class BasicTestCase(unittest.TestCase):
         """
         Initialisiert die Testumgebung für jeden Testfall, einschließlich einer Flask-App im Testmodus, einer In-Memory-Datenbank und eines Testclients.
         """
+        os.environ['SECRET_KEY'] = 'test-secret'
         self.app = create_app()
         self.app.config['TESTING'] = True
         self.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'

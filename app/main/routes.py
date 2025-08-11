@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime, timedelta
 
+import httpx
 from flask import (
     Blueprint,
     flash,
@@ -33,9 +34,11 @@ def home():
     """
     form = PlannerForm()
     try:
-        form.learning_subject.choices = current_app.content_library.get_subjects()
+        subjects = current_app.content_library.get_subjects()
+        form.learning_subject.choices = subjects
     except Exception as e:
         logger.error(f"Failed to load subjects: {e}")
+        subjects = []
         form.learning_subject.choices = []
         flash("Fächer konnten nicht geladen werden.", "warning")
 
@@ -53,7 +56,7 @@ def home():
     return render_template(
         'index.html',
         tasks=tasks,
-        subjects=current_app.content_library.get_subjects(),
+        subjects=subjects,
         days=WEEKDAYS,
         form=form,
         generated_text=generated_text
@@ -185,7 +188,8 @@ def generate_text():
             with Text() as text_generator:
                 generated_text = text_generator(prompt)
                 session['generated_text'] = generated_text
-        except (ConnectionError, TimeoutError):
+        except httpx.HTTPError as e:
+            logger.warning(f"HTTP error during text generation: {e}")
             flash(
                 "Verbindungsfehler bei der Textgenerierung. "
                 "Bitte versuchen Sie es später erneut.",
