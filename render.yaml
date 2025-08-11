@@ -9,7 +9,7 @@ services:
     name: wochenplan-app
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn "app:create_app()"
+    startCommand: gunicorn run:app
     envVars:
       - key: SECRET_KEY
         fromDatabase: true

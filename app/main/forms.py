@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import (
     DateTimeLocalField,
+    HiddenField,
     SelectField,
     StringField,
     SubmitField,
@@ -34,3 +35,8 @@ class PlannerForm(FlaskForm):
 class SubjectForm(FlaskForm):
     new_subject = StringField('Neues Fach', validators=[DataRequired()])
     submit = SubmitField('Hinzufügen')
+
+
+class RemoveSubjectForm(FlaskForm):
+    subject = HiddenField(validators=[DataRequired()])
+    submit = SubmitField('Entfernen')

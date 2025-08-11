@@ -112,20 +112,7 @@ class BasicTestCase(unittest.TestCase):
             task = self.app.task_manager.add_task(
                 'Mit Datum', priority=TaskPriority.HIGH, due_date=due
             )
-    @patch('pollinations.image.Image.__call__', new=_fake_image)
-    def test_subject_add_creates_image(self):
-        """Beim Hinzufügen eines Faches wird ein statisches Bild gespeichert."""
-        subject = 'Astrophysik'
-        image_path = os.path.join(
-            self.app.static_folder, 'subjects', secure_filename(subject) + '.png'
-        )
-        self.addCleanup(os.remove, image_path)
-
-        resp = self.client.post(
-            '/einstellungen', data={'new_subject': subject, 'submit': True}, follow_redirects=True
-        )
-        self.assertEqual(resp.status_code, 200)
-        self.assertTrue(os.path.exists(image_path))
+            fetched = self.app.task_manager.get_task(task.id)
             self.assertEqual(fetched.priority, TaskPriority.HIGH)
             self.assertEqual(fetched.due_date, due)
 
@@ -133,15 +120,22 @@ class BasicTestCase(unittest.TestCase):
     def test_subject_add_creates_image(self):
         """Beim Hinzufügen eines Faches wird ein statisches Bild gespeichert."""
         subject = 'Astrophysik'
+        image_path = os.path.join(
+            self.app.static_folder, 'subjects', secure_filename(subject) + '.png'
+        )
+        def cleanup_image(path):
+            try:
+                if os.path.exists(path):
+                    os.remove(path)
+            except (OSError, IOError) as e:
+                print(f"Warning: Failed to clean up test image at {path}: {e}")
+        self.addCleanup(cleanup_image, image_path)
+
         resp = self.client.post(
             '/einstellungen', data={'new_subject': subject, 'submit': True}, follow_redirects=True
         )
         self.assertEqual(resp.status_code, 200)
-        image_path = os.path.join(
-            self.app.static_folder, 'subjects', secure_filename(subject) + '.png'
-        )
         self.assertTrue(os.path.exists(image_path))
-        os.remove(image_path)
 
     def test_task_has_dynamic_image_url(self):
         """Aufgaben erhalten eine dynamische Pollinations-Bild-URL."""

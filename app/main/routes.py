@@ -25,7 +25,7 @@ from pollinations.text import Text
 from pollinations.image import Image as PollinationsImage
 from werkzeug.utils import secure_filename
 
-from .forms import PlannerForm, SubjectForm
+from .forms import PlannerForm, SubjectForm, RemoveSubjectForm
 from app.modules.task_manager import TaskPriority, TaskStatus
 
 
@@ -73,8 +73,7 @@ def home():
     tasks = current_app.task_manager.list_tasks()
     with PollinationsImage() as image_client:
         for t in tasks:
-    for t in tasks:
-        t.image_url = pollinations_image_client.url(f"{t.title} icon", width=256, height=256)
+            t.image_url = image_client.url(f"{t.title} icon", width=256, height=256)
     generated_text = session.pop('generated_text', None)
     return render_template(
         'index.html',
@@ -90,15 +89,20 @@ def home():
 def settings():
     """Rendert die Einstellungsseite und ermöglicht das Hinzufügen oder Entfernen von Fächern."""
     form = SubjectForm()
+    
+    # Handle removal requests using proper CSRF protection
     if request.method == 'POST' and request.form.get('action') == 'remove':
-        subject = request.form.get('subject')
-        try:
-            if subject:
+        remove_form = RemoveSubjectForm()
+        if remove_form.validate():
+            subject = remove_form.subject.data
+            try:
                 current_app.content_library.remove_subject(subject)
                 flash(f"Fach '{subject}' entfernt.", "success")
-        except Exception as e:
-            logger.error(f"Error managing subjects: {e}")
-            flash("Fehler beim Verwalten der Fächer.", "error")
+            except Exception as e:
+                logger.error(f"Error removing subject: {e}")
+                flash("Fehler beim Entfernen des Fachs.", "error")
+        else:
+            flash("Ungültige Anfrage zum Entfernen des Fachs.", "error")
         return redirect(url_for('main.settings'))
 
     if form.validate_on_submit():
@@ -133,25 +137,7 @@ def settings():
             flash("Fehler beim Verwalten der Fächer.", "error")
         return redirect(url_for('main.settings'))
 
-                try:
-                    filename = secure_filename(f"{subject}.png")
-                    folder = os.path.join(current_app.static_folder, 'subjects')
-                    os.makedirs(folder, exist_ok=True)
-                    path = os.path.join(folder, filename)
-                    with PollinationsImage() as img_client:
-                        img_client(
-                            prompt=f"school subject {subject} icon",
-                            save=True,
-                            file=path,
-                            width=256,
-                            height=256,
-                        )
-                    flash(f"Fach '{subject}' hinzugefügt.", "success")
-                except Exception as img_err:
-                    logger.error(f"Image generation failed for subject {subject}: {img_err}")
-                    flash(f"Fach '{subject}' hinzugefügt, aber das Icon konnte nicht generiert werden.", "warning")
-            else:
-                flash("Fach konnte nicht hinzugefügt werden.", "error")
+    try:
         subjects = current_app.content_library.get_subjects()
         subject_items = []
         for s in subjects:
@@ -160,7 +146,16 @@ def settings():
             image_url = None
             if os.path.exists(path):
                 image_url = url_for('static', filename=f'subjects/{filename}')
-            subject_items.append({'name': s, 'image_url': image_url})
+            
+            # Create a remove form for each subject with CSRF protection
+            remove_form = RemoveSubjectForm()
+            remove_form = make_remove_form(s)
+            
+            subject_items.append({
+                'name': s, 
+                'image_url': image_url,
+                'remove_form': remove_form
+            })
     except Exception as e:
         logger.error(f"Failed to load subjects: {e}")
         subject_items = []

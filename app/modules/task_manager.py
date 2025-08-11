@@ -68,7 +68,7 @@ class TaskManager:
         Returns:
             Optional[Task]: Die gefundene Aufgabe oder None, wenn keine Aufgabe mit dieser ID existiert.
         """
-        return Task.query.get(task_id)
+        return db.session.get(Task, task_id)
 
     def update_task_status(self, task_id: str, status: TaskStatus) -> bool:
         """
@@ -111,8 +111,7 @@ class TaskManager:
         if description is not None:
             task.description = description
         if priority is not None:
-        if priority is not None:
-            task.priority = priority.name
+            task.priority = priority
         if due_date is not None:
             task.due_date = due_date
         db.session.commit()
@@ -188,45 +187,9 @@ class TaskManager:
             ]
             for t in affected_tasks:
                 t.order -= 1
-def reorder_task(self, task_id: str, new_position: int) -> bool:
-    """Verschiebt eine Aufgabe an eine neue Position in der Liste."""
-    task = self.get_task(task_id)
-    if not task:
-        logging.warning(f"Versuch, eine nicht existierende Aufgabe zu verschieben: {task_id}")
-        return False
 
-    old_position = task.order
-    new_order = new_position + 1
-
-    if old_position == new_order:
-        return True  # Nichts zu tun
-
-    if new_order > old_position:
-        # Nach unten verschieben
-        affected_tasks = Task.query.filter(
-            Task.order > old_position, Task.order <= new_order
-        ).all()
-        for t in affected_tasks:
-            t.order -= 1
-    else:
-        # Nach oben verschieben
-        affected_tasks = Task.query.filter(
-            Task.order >= new_order, Task.order < old_position
-        ).all()
-        for t in affected_tasks:
-            t.order += 1
-
-    task.order = new_order
-    db.session.commit()
-    logging.info(
-        f"Aufgabe {task_id} wurde an Position {new_position} verschoben."
-    )
-    return True
-    if old_position == new_order:
-        return True
+        # Set new position for the task (convert 0-based to 1-based)
+        task.order = new_position + 1
         db.session.commit()
-        logging.info(
-            f"Aufgabe {task_id} wurde an Position {new_position} verschoben."
-        )
+        logging.info(f"Aufgabe {task_id} wurde an Position {new_position} verschoben.")
         return True
-        

@@ -30,10 +30,10 @@
                             {{ item.name }}
                         </span>
                         <form method="POST" action="{{ url_for('main.settings') }}" class="m-0">
-                            {{ csrf_token() }}
+                            {{ item.remove_form.hidden_tag() }}
+                            {{ item.remove_form.subject() }}
                             <input type="hidden" name="action" value="remove">
-                            <input type="hidden" name="subject" value="{{ item.name }}">
-                            <button type="submit" class="btn btn-sm btn-danger">Entfernen</button>
+                            {{ item.remove_form.submit(class='btn btn-sm btn-danger') }}
                         </form>
                     </li>
                     {% endfor %}
