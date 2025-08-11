@@ -112,5 +112,25 @@ class Image:
         return image
 
     # Alias für bessere Lesbarkeit
-    Generate = __call__
+    async def a(
+        self,
+        prompt: Prompt,
+        *,
+        save: bool = False,
+        file: Optional[Filename] = None,
+        **kwargs: Kwargs,
+    ) -> PILImage.Image:
+        params = self._default_params.copy()
+        params.update(kwargs)
+        response = await self._async_client.get(
+            self._build_url(prompt), params=params
+        )
+        response.raise_for_status()
+        image = PILImage.open(BytesIO(response.content))
+        if save and file:
+            image.save(file)
+        return image
+
+    # Alias für bessere Lesbarkeit
+    generate = __call__
 
