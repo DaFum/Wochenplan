@@ -73,7 +73,7 @@ def home():
     with PollinationsImage() as image_client:
         for t in tasks:
     for t in tasks:
-        t.image_url = pollinations_image_client.url(f"{t.title} icon", width=256, height=256)
+            t.image_url = image_client.url(f"{t.title} icon", width=256, height=256)
     
     generated_text = session.pop('generated_text', None)
     return render_template(
