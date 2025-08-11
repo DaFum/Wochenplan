@@ -190,4 +190,54 @@ class TaskManager:
       logging.info(
           f"Aufgabe {task_id} wurde an Position {new_position} verschoben."
       )
-      return True
+        """Ändert die Reihenfolge der Aufgaben basierend auf der neuen Position."""
+        task = self.get_task(task_id)
+        if not task:
+            logging.error(f"Aufgabe mit ID {task_id} nicht gefunden.")
+            return False
+
+        # Validiere new_position
+        if new_position < 0:
+            logging.error(f"Ungültige Position: {new_position} (muss >= 0 sein)")
+            return False
+
+        # Fetch all tasks ordered by 'order'
+        tasks = Task.query.order_by(Task.order).all()
+        num_tasks = len(tasks)
+        # Begrenze new_position auf gültigen Bereich
+        new_position = min(new_position, num_tasks - 1)
+
+        # Finde aktuelle Position des Tasks
+        try:
+            old_position = next(i for i, t in enumerate(tasks) if t.id == task.id)
+        except StopIteration:
+            logging.error(f"Aufgabe mit ID {task_id} nicht in der aktuellen Liste gefunden.")
+            return False
+
+        if new_position == old_position:
+            # Keine Änderung nötig
+            return True
+
+        if new_position < old_position:
+            # Task nach oben verschieben: Inkrementiere order für betroffene Tasks
+            affected_tasks = [
+                t for i, t in enumerate(tasks)
+                if new_position <= i < old_position
+            ]
+            for t in affected_tasks:
+                t.order += 1
+        else:
+            # Task nach unten verschieben: Dekrementiere order für betroffene Tasks
+            affected_tasks = [
+                t for i, t in enumerate(tasks)
+                if old_position < i <= new_position
+            ]
+            for t in affected_tasks:
+                t.order -= 1
+
+        task.order = new_position
+        db.session.commit()
+        logging.info(
+            f"Aufgabe {task_id} wurde an Position {new_position} verschoben."
+        )
+        return True
