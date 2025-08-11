@@ -22,6 +22,7 @@ with app.app_context():
         upgrade()
     except Exception as e:
         logging.error("Database migration failed: %s", e)
+        raise
 
 
 # Add health check endpoint for Render
