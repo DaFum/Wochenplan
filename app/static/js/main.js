@@ -3,7 +3,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const tabs = document.querySelectorAll('.nav-link');
     tabs.forEach(tab => {
         tab.addEventListener('show.bs.tab', function(event) {
-            gsap.fromTo(event.target, { opacity: 0 }, { opacity: 1, duration: 0.5 });
+            const targetId = event.target.getAttribute('data-bs-target');
+            const targetPane = document.querySelector(targetId);
+            if (targetPane) {
+                gsap.fromTo(targetPane, { opacity: 0 }, { opacity: 1, duration: 0.5 });
+            }
         });
     });
 
