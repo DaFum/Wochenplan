@@ -189,7 +189,8 @@ def generate_text():
                 generated_text = text_generator(prompt)
                 session['generated_text'] = generated_text
         except httpx.HTTPError as e:
-            logger.warning(f"HTTP error during text generation: {e}")
+        except (ConnectError, TimeoutException) as e:
+            logger.warning(f"HTTP-Verbindungsfehler während der Textgenerierung: {e}")
             flash(
                 "Verbindungsfehler bei der Textgenerierung. "
                 "Bitte versuchen Sie es später erneut.",
