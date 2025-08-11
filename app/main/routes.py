@@ -165,7 +165,7 @@ def change_status(task_id):
     return redirect(url_for('main.home'))
 
 
-@main_bp.route('/send-reminder/<task_id>')
+@main_bp.route('/send-reminder/<task_id>', methods=['POST'])
 def send_reminder(task_id):
     """
     Sendet eine Erinnerungsbenachrichtigung für eine bestimmte Aufgabe an die im Nutzer-Session hinterlegte E-Mail-Adresse.
