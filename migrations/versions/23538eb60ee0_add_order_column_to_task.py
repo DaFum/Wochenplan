@@ -24,7 +24,6 @@ def upgrade():
         )
 
     # Set a default order for existing rows
-    op.execute('UPDATE task SET "order" = 0')
 
     # Now make the column non-nullable
     with op.batch_alter_table('task', schema=None) as batch_op:
