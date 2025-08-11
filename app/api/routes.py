@@ -19,6 +19,7 @@ def library_tasks(subject):
     """Return preset tasks for a given subject from the content library."""
     try:
         tasks = current_app.content_library.get_tasks_for_subject(subject)
-    except Exception:
+    except Exception as e:
+        current_app.logger.error(f"Error fetching library tasks for subject '{subject}': {e}")
         return jsonify({'tasks': []}), 400
     return jsonify({'tasks': tasks})
