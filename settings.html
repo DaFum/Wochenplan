@@ -22,6 +22,7 @@
                 <span>{{ subject }}</span>
                 <form method="POST" action="{{ url_for('main.settings') }}" class="m-0">
                     <input type="hidden" name="action" value="remove">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="subject" value="{{ subject }}">
                     <button type="submit" class="btn btn-sm btn-danger">Entfernen</button>
                 </form>
