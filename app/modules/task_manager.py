@@ -221,7 +221,8 @@ def reorder_task(self, task_id: str, new_position: int) -> bool:
         f"Aufgabe {task_id} wurde an Position {new_position} verschoben."
     )
     return True
-        task.order = new_position + 1
+    if old_position == new_order:
+        return True
         db.session.commit()
         logging.info(
             f"Aufgabe {task_id} wurde an Position {new_position} verschoben."
