@@ -9,7 +9,7 @@
 <body>
     <div class="container mt-5">
         <h1>Einstellungen</h1>
-        <form method="POST" action="{{ url_for('settings') }}" class="mb-3 d-flex">
+        <form method="POST" action="{{ url_for('main.settings') }}" class="mb-3 d-flex">
             <input type="hidden" name="action" value="add">
             <input type="text" class="form-control me-2" name="subject" placeholder="Neues Fach" required>
             <button type="submit" class="btn btn-primary">Hinzufügen</button>
