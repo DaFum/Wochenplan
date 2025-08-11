@@ -1,15 +1,20 @@
 document.addEventListener('DOMContentLoaded', function() {
+    'use strict';
+    
     // GSAP animations for tab transitions
     const tabs = document.querySelectorAll('.nav-link');
-    tabs.forEach(tab => {
-        tab.addEventListener('show.bs.tab', function(event) {
-            const targetId = event.target.getAttribute('data-bs-target');
-            const targetPane = document.querySelector(targetId);
-            if (targetPane) {
-                gsap.fromTo(targetPane, { opacity: 0 }, { opacity: 1, duration: 0.5 });
-            }
+    if (typeof gsap !== 'undefined') {
+        tabs.forEach(tab => {
+            tab.addEventListener('show.bs.tab', function(event) {
+                const targetId = event.target.getAttribute('data-bs-target');
+                const targetPane = document.querySelector(targetId);
+                if (targetPane) {
+                    gsap.fromTo(targetPane, { opacity: 0 }, { opacity: 1, duration: 0.5 });
+                }
+            });
         });
-    });
+    }
+});
 
     // Swipe gestures for mobile devices
     let touchstartX = 0;
