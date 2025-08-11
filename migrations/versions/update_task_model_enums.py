@@ -94,7 +94,7 @@ def downgrade():
     
     # Migrate data back (this will lose the integer IDs)
     connection = op.get_bind()
-    result = connection.execute(sa.text("SELECT * FROM task ORDER BY [order]"))
+    result = connection.execute(sa.text("SELECT id, title, description, priority, status, due_date, [order] FROM task ORDER BY [order]"))
     rows = result.fetchall()
     
     import uuid
