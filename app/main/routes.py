@@ -191,40 +191,40 @@ def send_reminder(task_id):
 def generate_text():
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     prompt = request.form.get('prompt')
-    if prompt:
+
+    message = None
+    status_code = 500
+
+    if not prompt:
+        message = "Kein Prompt übergeben."
+        status_code = 400
+    else:
         try:
             with Text() as text_generator:
                 generated_text = text_generator(prompt)
-                if is_ajax:
-                    return jsonify({'generated_text': generated_text})
-                session['generated_text'] = generated_text
+
+            if is_ajax:
+                return jsonify({'generated_text': generated_text})
+
+            session['generated_text'] = generated_text
+            return redirect(url_for('main.home'))
+
         except httpx.HTTPError as e:
             logger.warning(f"HTTP-Fehler während der Textgenerierung: {e}")
             message = (
                 "HTTP-Fehler bei der Textgenerierung. Bitte versuchen Sie es später erneut."
             )
-            if is_ajax:
-                return jsonify({'error': message}), 500
-            flash(message, "error")
         except (httpx.ConnectError, httpx.TimeoutException) as e:
             logger.warning(f"HTTP-Verbindungsfehler während der Textgenerierung: {e}")
             message = (
                 "Verbindungsfehler bei der Textgenerierung. Bitte versuchen Sie es später erneut."
             )
-            if is_ajax:
-                return jsonify({'error': message}), 500
-            flash(message, "error")
         except Exception as e:
             logger.error(f"Text generation failed: {e}")
-            message = (
-                "Textgenerierung fehlgeschlagen. Bitte versuchen Sie es erneut."
-            )
-            if is_ajax:
-                return jsonify({'error': message}), 500
-            flash(message, "error")
-    else:
-        message = "Kein Prompt übergeben."
-        if is_ajax:
-            return jsonify({'error': message}), 400
-        flash(message, "error")
+            message = "Textgenerierung fehlgeschlagen. Bitte versuchen Sie es erneut."
+
+    if is_ajax:
+        return jsonify({'error': message}), status_code
+
+    flash(message, "error")
     return redirect(url_for('main.home'))
