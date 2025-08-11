@@ -92,7 +92,7 @@ class Image:
             image.save(file)
         return image
 
-    async def Async(
+    async def generate_async(
         self,
         prompt: Prompt,
         *,
