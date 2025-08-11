@@ -61,7 +61,7 @@
                                 <h5 class="mb-1">{{ task.title }}</h5>
                                 <p class="mb-1">{{ task.description }}</p>
                                 <span class="badge bg-secondary">{{ task.priority }}</span>
-                                <span class="badge{% if task.status == 'OPEN' %} bg-primary{% elif task.status == 'IN_PROGRESS' %} bg-warning{% else %} bg-success{% endif %}">{{ task.status }}</span>
+                                <span class="badge{% if task.status.name == 'OPEN' %} bg-primary{% elif task.status.name == 'IN_PROGRESS' %} bg-warning{% else %} bg-success{% endif %}">{{ task.status.name }}</span>
                             </div>
                             <div class="text-end">
                                 <form method="POST" action="{{ url_for('main.change_status', task_id=task.id) }}" class="d-inline">
