@@ -64,7 +64,8 @@ def upgrade():
         
         connection.execute(sa.text(
             "INSERT INTO task_new (id, title, description, priority, status, due_date, [order]) "
-            "VALUES (:id, :title, :description, :priority, :status, :due_date, :order)"
+            'INSERT INTO task_new (id, title, description, priority, status, due_date, "order") '
+            'VALUES (:id, :title, :description, :priority, :status, :due_date, :order)'
         ), {
             'id': i,
             'title': row[1],
