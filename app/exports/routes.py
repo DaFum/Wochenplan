@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 import io
 
-from flask import send_file, render_template
+from flask import send_file, render_template, current_app
 from weasyprint import HTML
 
 from app.modules.ical_exporter import ICalExporter

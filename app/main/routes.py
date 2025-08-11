@@ -25,7 +25,7 @@ from pollinations.text import Text
 from pollinations.image import Image as PollinationsImage
 from werkzeug.utils import secure_filename
 
-from .forms import PlannerForm, SubjectForm
+from .forms import PlannerForm, SubjectForm, RemoveSubjectForm
 from app.modules.task_manager import TaskPriority, TaskStatus
 
 
@@ -89,15 +89,20 @@ def home():
 def settings():
     """Rendert die Einstellungsseite und ermöglicht das Hinzufügen oder Entfernen von Fächern."""
     form = SubjectForm()
+    
+    # Handle removal requests using proper CSRF protection
     if request.method == 'POST' and request.form.get('action') == 'remove':
-        subject = request.form.get('subject')
-        try:
-            if subject:
+        remove_form = RemoveSubjectForm()
+        if remove_form.validate():
+            subject = remove_form.subject.data
+            try:
                 current_app.content_library.remove_subject(subject)
                 flash(f"Fach '{subject}' entfernt.", "success")
-        except Exception as e:
-            logger.error(f"Error managing subjects: {e}")
-            flash("Fehler beim Verwalten der Fächer.", "error")
+            except Exception as e:
+                logger.error(f"Error removing subject: {e}")
+                flash("Fehler beim Entfernen des Fachs.", "error")
+        else:
+            flash("Ungültige Anfrage zum Entfernen des Fachs.", "error")
         return redirect(url_for('main.settings'))
 
     if form.validate_on_submit():
@@ -141,7 +146,16 @@ def settings():
             image_url = None
             if os.path.exists(path):
                 image_url = url_for('static', filename=f'subjects/{filename}')
-            subject_items.append({'name': s, 'image_url': image_url})
+            
+            # Create a remove form for each subject with CSRF protection
+            remove_form = RemoveSubjectForm()
+            remove_form.subject.data = s
+            
+            subject_items.append({
+                'name': s, 
+                'image_url': image_url,
+                'remove_form': remove_form
+            })
     except Exception as e:
         logger.error(f"Failed to load subjects: {e}")
         subject_items = []

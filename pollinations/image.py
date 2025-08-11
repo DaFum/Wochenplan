@@ -12,7 +12,7 @@ from typing import Any, Dict, Optional
 from urllib.parse import quote, urlencode
 
 import httpx
-from PIL import Image as PILImage
+from PIL import Image as PILImage, UnidentifiedImageError
 
 Prompt = str
 Model = str
@@ -87,9 +87,15 @@ class Image:
         params.update(kwargs)
         response = self._sync_client.get(self._build_url(prompt), params=params)
         response.raise_for_status()
-        image = PILImage.open(BytesIO(response.content))
+        try:
+            image = PILImage.open(BytesIO(response.content))
+        except (UnidentifiedImageError, OSError) as e:
+            raise RuntimeError(f"Failed to decode image: {e}") from e
         if save and file:
-            image.save(file)
+            try:
+                image.save(file)
+            except OSError as e:
+                raise RuntimeError(f"Failed to save image: {e}") from e
         return image
 
     async def generate_async(
@@ -106,9 +112,15 @@ class Image:
             self._build_url(prompt), params=params
         )
         response.raise_for_status()
-        image = PILImage.open(BytesIO(response.content))
+        try:
+            image = PILImage.open(BytesIO(response.content))
+        except (UnidentifiedImageError, OSError) as e:
+            raise RuntimeError(f"Failed to decode image: {e}") from e
         if save and file:
-            image.save(file)
+            try:
+                image.save(file)
+            except OSError as e:
+                raise RuntimeError(f"Failed to save image: {e}") from e
         return image
 
     # Alias für bessere Lesbarkeit

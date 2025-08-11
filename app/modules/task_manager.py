@@ -68,7 +68,7 @@ class TaskManager:
         Returns:
             Optional[Task]: Die gefundene Aufgabe oder None, wenn keine Aufgabe mit dieser ID existiert.
         """
-        return Task.query.get(task_id)
+        return db.session.get(Task, task_id)
 
     def update_task_status(self, task_id: str, status: TaskStatus) -> bool:
         """
