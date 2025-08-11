@@ -124,8 +124,11 @@ class BasicTestCase(unittest.TestCase):
             self.app.static_folder, 'subjects', secure_filename(subject) + '.png'
         )
         def cleanup_image(path):
-            if os.path.exists(path):
-                os.remove(path)
+            try:
+                if os.path.exists(path):
+                    os.remove(path)
+            except (OSError, IOError) as e:
+                print(f"Warning: Failed to clean up test image at {path}: {e}")
         self.addCleanup(cleanup_image, image_path)
 
         resp = self.client.post(
