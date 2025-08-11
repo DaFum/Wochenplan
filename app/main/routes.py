@@ -92,10 +92,14 @@ def settings():
 @main_bp.route('/task/<task_id>/reorder', methods=['POST'])
 def reorder_task(task_id):
     """Aktualisiert die Reihenfolge der Aufgaben."""
-    new_position = request.json.get('position')
-    if new_position is None:
+    data = request.get_json(silent=True) or {}
+    if 'position' not in data:
         return {'error': 'Position missing'}, 400
-    if current_app.task_manager.reorder_task(task_id, int(new_position)):
+    try:
+        new_position = int(data['position'])
+    except (TypeError, ValueError):
+        return {'error': 'Position must be an integer'}, 400
+    if current_app.task_manager.reorder_task(task_id, new_position):
         return {'status': 'ok'}
     return {'error': 'Task not found'}, 404
 
