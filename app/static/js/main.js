@@ -37,11 +37,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (tabsElement) {
         tabsElement.addEventListener('touchstart', e => {
             touchstartX = e.changedTouches[0].screenX;
-        });
+        }, { passive: true });
         tabsElement.addEventListener('touchend', e => {
             touchendX = e.changedTouches[0].screenX;
             handleGesture();
-        });
+        }, { passive: true });
     }
 
     // Dark mode toggle
