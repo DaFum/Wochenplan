@@ -104,7 +104,14 @@ def downgrade():
     for row in rows:
         connection.execute(sa.text(
             "INSERT INTO task_old (id, title, description, priority, status, start_time, end_time, [order]) "
-            "VALUES (:id, :title, :description, :priority, :status, :start_time, :end_time, :order)"
+    result = connection.execute(sa.text('SELECT id, title, description, priority, status, due_date, "order" FROM task ORDER BY "order"'))
+    rows = result.fetchall()
+    
+    import uuid
+    for row in rows:
+        connection.execute(sa.text(
+            'INSERT INTO task_old (id, title, description, priority, status, start_time, end_time, "order") '
+            'VALUES (:id, :title, :description, :priority, :status, :start_time, :end_time, :order)'
         ), {
             'id': str(uuid.uuid4()),
             'title': row[1],
