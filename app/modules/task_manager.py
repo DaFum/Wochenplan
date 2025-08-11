@@ -110,7 +110,12 @@ class TaskManager:
         start_time: Optional[datetime] = None,
         end_time: Optional[datetime] = None,
     ) -> bool:
-        """Aktualisiert Felder einer bestehenden Aufgabe."""
+        """Aktualisiert eine bestehende Aufgabe.
+
+        Übergebene Parameter überschreiben die vorhandenen Werte. Nicht
+        angegebene Felder bleiben unverändert. Gibt ``True`` zurück, wenn die
+        Aufgabe gefunden und gespeichert wurde, andernfalls ``False``.
+        """
         task = self.get_task(task_id)
         if not task:
             logging.error(f"Aufgabe mit ID {task_id} nicht gefunden.")
@@ -133,7 +138,11 @@ class TaskManager:
         return True
 
     def delete_task(self, task_id: str) -> bool:
-        """Löscht eine Aufgabe anhand ihrer ID."""
+        """Löscht eine Aufgabe anhand ihrer ID.
+
+        Rückgabewert ist ``True``, wenn die Aufgabe existierte und entfernt
+        wurde, sonst ``False``.
+        """
         task = self.get_task(task_id)
         if not task:
             logging.error(f"Aufgabe mit ID {task_id} nicht gefunden.")

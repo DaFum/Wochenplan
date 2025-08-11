@@ -47,12 +47,12 @@ class BasicTestCase(unittest.TestCase):
             tasks = self.app.task_manager.list_tasks()
             self.assertEqual([t.id for t in tasks], [t2_id, t1_id])
 
-    def test_update_task(self):
-        """Prüft, ob das Aktualisieren einer Aufgabe funktioniert."""
+    def test_edit_task(self):
+        """Prüft, ob das Bearbeiten einer Aufgabe funktioniert."""
         with self.app.app_context():
             task = self.app.task_manager.add_task('Alt')
             tid = task.id
-        resp = self.client.post(f'/task/{tid}/update', data={'title': 'Neu'})
+        resp = self.client.post(f'/task/{tid}/edit', data={'title': 'Neu'})
         self.assertEqual(resp.status_code, 302)
         with self.app.app_context():
             updated = self.app.task_manager.get_task(tid)
