@@ -11,6 +11,7 @@ from io import BytesIO
 from typing import Any, Dict, Optional
 from urllib.parse import quote, urlencode
 
+import logging
 import httpx
 from PIL import Image as PILImage, UnidentifiedImageError
 
@@ -87,14 +88,15 @@ class Image:
         params.update(kwargs)
         response = self._sync_client.get(self._build_url(prompt), params=params)
         response.raise_for_status()
-        if response.headers.get('content-type', '').startswith('image/'):
-            try:
+        content_type = response.headers.get('content-type', '')
+        try:
+            if content_type.startswith('image/') or not content_type:
                 image = PILImage.open(BytesIO(response.content))
-            except (UnidentifiedImageError, OSError) as e:
-                raise RuntimeError(f"Failed to decode image: {e}") from e
-        else:
-            logging.error("API returned non-image content: %s", response.text)
-            raise RuntimeError("API returned non-image content.")
+            else:
+                logging.error("API returned non-image content: %s", response.text)
+                raise RuntimeError("API returned non-image content.")
+        except (UnidentifiedImageError, OSError) as e:
+            raise RuntimeError(f"Failed to decode image: {e}") from e
         if save and file:
             try:
                 image.save(file)

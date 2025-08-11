@@ -6,7 +6,7 @@
 import os
 import logging
 from app import create_app, db
-from flask_migrate import Migrate
+from flask_migrate import Migrate, upgrade
 
 # Configure logging for production
 logging.basicConfig(
@@ -16,6 +16,12 @@ logging.basicConfig(
 
 app = create_app()
 migrate = Migrate(app, db)
+# Ensure database schema is up-to-date on startup
+with app.app_context():
+    try:
+        upgrade()
+    except Exception as e:
+        logging.error("Database migration failed: %s", e)
 
 
 # Add health check endpoint for Render
