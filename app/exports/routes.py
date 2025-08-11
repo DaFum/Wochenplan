@@ -23,7 +23,7 @@ def download_ical():
     """
     tasks = task_manager.list_tasks()
     events = []
-    tz = ZoneInfo("Europe/Berlin")
+    tz = ZoneInfo(current_app.config.get('DEFAULT_TIMEZONE', 'Europe/Berlin'))
     for task in tasks:
         start_time = task.due_date or datetime.now(tz)
         if start_time.tzinfo is None:
