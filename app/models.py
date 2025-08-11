@@ -44,7 +44,7 @@ class Task(db.Model):
     status = db.Column(db.String(20), default='OPEN')
     start_time = db.Column(db.DateTime)
     end_time = db.Column(db.DateTime)
-    order = db.Column(db.Integer, default=0)
+    order = db.Column(db.Integer, default=0, nullable=False)
 
     def __repr__(self):
         """
