@@ -150,7 +150,7 @@ class TaskManager:
             logging.error(f"Ungültige Position: {new_position} (muss >= 0 sein)")
             return False
 
-        total = Task.query.count()
+        total = db.session.query(func.count(Task.id)).scalar()
         if total == 0:
             return False
 
