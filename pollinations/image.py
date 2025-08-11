@@ -87,10 +87,13 @@ class Image:
         params.update(kwargs)
         response = self._sync_client.get(self._build_url(prompt), params=params)
         response.raise_for_status()
-        try:
-            image = PILImage.open(BytesIO(response.content))
-        except (UnidentifiedImageError, OSError) as e:
-            raise RuntimeError(f"Failed to decode image: {e}") from e
+        if response.headers.get('content-type', '').startswith('image/'):
+            try:
+                image = PILImage.open(BytesIO(response.content))
+            except (UnidentifiedImageError, OSError) as e:
+                raise RuntimeError(f"Failed to decode image: {e}") from e
+        else:
+            raise RuntimeError(f"API returned non-image content: {response.text[:100]}...")
         if save and file:
             try:
                 image.save(file)
