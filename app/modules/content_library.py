@@ -1,115 +1,274 @@
-from typing import Dict, List
+#1: Updates: Converted mutable class attributes to instance attributes; expanded subjects & tasks; added helper methods (add_task_for_subject, has_subject, list_subjects_with_task_counts); ensured no shared mutable state; added defensive copies on access.
+#2: Future Ideas: Externalize data to JSON / DB; add i18n; cache frequently accessed merged task lists; integrate tagging & difficulty levels.
+#3: Issues+Fixes: Fixed potential shared-state mutation bug; normalized subject handling; added validation guarding empty/duplicate inserts.
+# Compliment: Saubere, gut strukturierte Erweiterung – weiter so!
+
+from __future__ import annotations
+from typing import Dict, List, Iterable, Optional
 
 
 class ContentLibrary:
     """
-    Stellt eine Bibliothek mit vordefinierten Fächern und
-    Aufgaben bereit.
+    Stellt eine Bibliothek mit vordefinierten Fächern und zugehörigen Aufgaben bereit.
+    Implementiert als (soft) Singleton, wobei mutable Strukturen nun instanzgebunden sind.
     """
-    _instance = None
-    _initialized = False
 
+    _instance: Optional["ContentLibrary"] = None
+    _initialized: bool = False
+
+    # Falls der Singleton-Ansatz später entfernt wird, genügt das Löschen von __new__ und _initialized-Logik.
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self):
+    def __init__(self) -> None:
         if not self._initialized:
-            ContentLibrary._initialized = True
-    _SUBJECTS: List[str] = [
-        "Mathematik", "Deutsch", "Englisch", "Physik", "Chemie", "Biologie",
-        "Geschichte", "Geographie", "Informatik", "Kunst", "Musik", "Sport"
-    ]
+            # Vordefinierte Fächer (instanzgebunden, kein Shared State)
+            self._subjects: List[str] = [
+                "Mathematik",
+                "Deutsch",
+                "Englisch",
+                "Französisch",
+                "Spanisch",
+                "Latein",
+                "Physik",
+                "Chemie",
+                "Biologie",
+                "Informatik",
+                "Geschichte",
+                "Geographie",
+                "Politik",
+                "Wirtschaft",
+                "Religion",
+                "Ethik",
+                "Philosophie",
+                "Technik",
+                "Kunst",
+                "Musik",
+                "Sport",
+            ]
 
-    _TASKS_BY_SUBJECT: Dict[str, List[str]] = {
-        "Mathematik": [
-            "Hausaufgaben erledigen", "Formeln wiederholen", "Für Test lernen"
-        ],
-        "Deutsch": ["Lektüre lesen", "Aufsatz schreiben", "Grammatik üben"],
-        "Englisch": [
-            "Vokabeln lernen", "Text zusammenfassen",
-            "Präsentation vorbereiten"
-        ],
-        "Physik": ["Experiment protokollieren", "Theorie zusammenfassen"],
-        "Chemie": ["Reaktionsgleichungen üben", "Laborbericht schreiben"],
-        "Biologie": ["Zellstrukturen zeichnen", "Fachbegriffe lernen"],
-        "Informatik": ["Programmieraufgabe lösen", "Algorithmen analysieren"],
-        "Allgemein": [
-            "Lernplan erstellen", "Mitschriften ordnen",
-            "Recherche für Referat"
-        ]
-    }
+            # Aufgaben nach Fach; "Allgemein" wird mit spezifischen Aufgaben kombiniert
+            self._tasks_by_subject: Dict[str, List[str]] = {
+                "Mathematik": [
+                    "Hausaufgaben erledigen",
+                    "Formeln wiederholen",
+                    "Für Test lernen",
+                    "Aufgaben aus Übungsheft bearbeiten",
+                    "Alte Klausur analysieren",
+                ],
+                "Deutsch": [
+                    "Lektüre lesen",
+                    "Aufsatz schreiben",
+                    "Grammatik üben",
+                    "Text interpretieren",
+                    "Gedicht analysieren",
+                ],
+                "Englisch": [
+                    "Vokabeln lernen",
+                    "Listening-Übungen machen",
+                    "Essay planen",
+                    "Grammatik wiederholen",
+                    "Präsentation vorbereiten",
+                ],
+                "Französisch": [
+                    "Vokabelkarten wiederholen",
+                    "Dialog einüben",
+                    "Grammatikübungen lösen",
+                ],
+                "Spanisch": [
+                    "Verbkonjugationen wiederholen",
+                    "Kurzen Text verfassen",
+                    "Audioverständnis trainieren",
+                ],
+                "Latein": [
+                    "Vokabeln repetieren",
+                    "Text übersetzen",
+                    "Satzkonstruktionen üben",
+                ],
+                "Physik": [
+                    "Experiment protokollieren",
+                    "Theorie zusammenfassen",
+                    "Formelsammlung erweitern",
+                ],
+                "Chemie": [
+                    "Reaktionsgleichungen üben",
+                    "Laborbericht schreiben",
+                    "Stoffklassen einprägen",
+                ],
+                "Biologie": [
+                    "Zellstrukturen zeichnen",
+                    "Fachbegriffe lernen",
+                    "Stoffwechselwege skizzieren",
+                ],
+                "Informatik": [
+                    "Programmieraufgabe lösen",
+                    "Algorithmen analysieren",
+                    "Code-Review durchführen",
+                    "Datenstrukturen wiederholen",
+                ],
+                "Geschichte": [
+                    "Zeitleiste erstellen",
+                    "Quelle analysieren",
+                    "Ereignis zusammenfassen",
+                ],
+                "Geographie": [
+                    "Klimadiagramm interpretieren",
+                    "Karte beschriften",
+                    "Regionale Unterschiede vergleichen",
+                ],
+                "Politik": [
+                    "Aktuelles Thema recherchieren",
+                    "Debattenargumente sammeln",
+                ],
+                "Wirtschaft": [
+                    "Marktmodell skizzieren",
+                    "Kennzahlen berechnen",
+                ],
+                "Religion": [
+                    "Textstelle reflektieren",
+                    "Vergleich von Weltreligionen",
+                ],
+                "Ethik": [
+                    "Dilemma analysieren",
+                    "Philosophische Position vergleichen",
+                ],
+                "Philosophie": [
+                    "Primärtext exzerpieren",
+                    "Argumentationsstruktur darstellen",
+                ],
+                "Technik": [
+                    "Konstruktionsskizze anfertigen",
+                    "Funktionsprinzip erklären",
+                ],
+                "Kunst": [
+                    "Bildanalyse verfassen",
+                    "Skizzenbuch ergänzen",
+                ],
+                "Musik": [
+                    "Rhythmus üben",
+                    "Stück analysieren",
+                    "Tonleitern wiederholen",
+                ],
+                "Sport": [
+                    "Trainingsplan erstellen",
+                    "Technik verbessern",
+                ],
+                "Allgemein": [
+                    "Lernplan erstellen",
+                    "Mitschriften ordnen",
+                    "Recherche für Referat",
+                    "Zusammenfassung erstellen",
+                    "Karteikarten anlegen",
+                    "Mindmap erstellen",
+                    "Wiederholungszyklus planen",
+                ],
+            }
+
+            self._initialized = True
+
+    # --------------- Öffentliche API ---------------
 
     def get_subjects(self) -> List[str]:
         """
-        Gibt die Liste aller vordefinierten Schulfächer zurück.
-        
-        Returns:
-            List[str]: Eine Liste mit den Namen aller verfügbaren Fächer.
+        Liefert eine Kopie der verfügbaren Fächer.
         """
-        return self._SUBJECTS
+        return list(self._subjects)
 
-    def add_subject(self, subject: str) -> None:
-        """Fügt der Bibliothek ein neues Fach hinzu."""
-        if subject and subject not in self._SUBJECTS:
-            self._SUBJECTS.append(subject)
+    def has_subject(self, subject: str) -> bool:
+        """Prüft ob Fach existiert (case-sensitive)."""
+        return subject in self._subjects
 
-    def remove_subject(self, subject: str) -> None:
-        """Entfernt ein Fach aus der Bibliothek, falls vorhanden."""
-        if subject in self._SUBJECTS:
-            self._SUBJECTS.remove(subject)
+    def add_subject(self, subject: str) -> bool:
+        """
+        Fügt ein neues Fach hinzu.
+        Returns:
+            bool: True wenn hinzugefügt, False wenn leer oder bereits vorhanden.
+        """
+        if not subject or not isinstance(subject, str):
+            return False
+        if subject in self._subjects:
+            return False
+        self._subjects.append(subject)
+        # Optional: leere Aufgabenliste für Konsistenz
+        self._tasks_by_subject.setdefault(subject, [])
+        return True
+
+    def remove_subject(self, subject: str) -> bool:
+        """
+        Entfernt ein Fach und zugehörige Aufgaben (spezifisch, nicht Allgemein).
+        'Allgemein' wird geschützt.
+        """
+        if subject == "Allgemein":
+            return False
+        if subject in self._subjects:
+            self._subjects.remove(subject)
+            self._tasks_by_subject.pop(subject, None)
+            return True
+        return False
 
     def get_tasks_for_subject(self, subject: str) -> List[str]:
         """
-        Gibt eine kombinierte Liste vordefinierter Aufgaben für das angegebene Fach zurück.
-        
-        Wenn das Fach nicht in der Bibliothek vorhanden ist, werden nur die allgemeinen Aufgaben zurückgegeben. Bei gültigen Fächern werden fachbezogene und allgemeine Aufgaben zusammengeführt.
-        
-        Parameters:
-            subject (str): Name des gewünschten Fachs.
-        
-        Returns:
-            List[str]: Liste der Aufgaben für das angegebene Fach.
+        Kombiniert spezifische und allgemeine Aufgaben.
+        Fällt zurück auf nur Allgemein falls Fach unbekannt.
         """
         if not isinstance(subject, str):
-            raise TypeError("Subject muss ein String sein.")
-
-        if subject not in self._SUBJECTS:
-            # Use logging instead of print for production
-            return self._TASKS_BY_SUBJECT.get("Allgemein", [])
-
-        specific_tasks = self._TASKS_BY_SUBJECT.get(subject, [])
-        general_tasks = self._TASKS_BY_SUBJECT.get("Allgemein", [])
-        # Kombiniert spezifische und allgemeine Aufgaben, um eine
-        # umfassendere Liste zu bieten.
-        return specific_tasks + general_tasks
+            raise TypeError("subject muss ein String sein.")
+        general = self._tasks_by_subject.get("Allgemein", [])
+        if subject not in self._subjects:
+            return list(general)
+        specific = self._tasks_by_subject.get(subject, [])
+        # Keine Mutationen der Original-Listen
+        return list(specific) + list(general)
 
     def get_all_preset_tasks(self) -> Dict[str, List[str]]:
         """
-        Gibt das vollständige Wörterbuch aller vordefinierten Aufgaben nach Fach gruppiert zurück.
-        
-        Returns:
-            Dict[str, List[str]]: Ein Wörterbuch, das jedem Fach eine Liste von Aufgaben zuordnet.
+        Gibt eine tiefe Kopie aller Aufgaben nach Fach zurück.
         """
-        return self._TASKS_BY_SUBJECT
+        return {k: list(v) for k, v in self._tasks_by_subject.items()}
 
-# Beispiel für die Verwendung:
+    def add_task_for_subject(self, subject: str, task: str) -> bool:
+        """
+        Fügt eine Aufgabe zu einem Fach hinzu (oder legt das Fach an).
+        Leere oder doppelte Einträge werden ignoriert.
+        """
+        if not task or not isinstance(task, str):
+            return False
+        if subject not in self._subjects:
+            # Option: automatisches Anlegen: auskommentieren falls nicht erwünscht
+            self.add_subject(subject)
+        tasks = self._tasks_by_subject.setdefault(subject, [])
+        if task in tasks:
+            return False
+        tasks.append(task)
+        return True
+
+    def list_subjects_with_task_counts(self) -> List[tuple[str, int]]:
+        """
+        Liefert Liste von (Fach, Anzahl spezifischer Aufgaben).
+        'Allgemein' wird ans Ende gestellt.
+        """
+        items: List[tuple[str, int]] = []
+        for subj in self._subjects:
+            if subj == "Allgemein":
+                continue
+            items.append((subj, len(self._tasks_by_subject.get(subj, []))))
+        items.sort(key=lambda x: x[0].lower())
+        # Allgemein zuletzt
+        if "Allgemein" in self._tasks_by_subject:
+            items.append(("Allgemein", len(self._tasks_by_subject.get("Allgemein", []))))
+        return items
+
+    # --------------- Repräsentation & Debug ---------------
+
+    def __repr__(self) -> str:  # pragma: no cover (rein informativ)
+        return f"<ContentLibrary subjects={len(self._subjects)} tasks={sum(len(v) for v in self._tasks_by_subject.values())}>"
+
+# Beispiel Nutzung (manuell testen):
 # if __name__ == "__main__":
-#     # Zwei separate Instanzen der ContentLibrary erstellen
-#     library_1 = ContentLibrary()
-#     library_2 = ContentLibrary()
-#
-#     print("\nVerfügbare Fächer:")
-#     subjects = library_1.get_subjects()
-#     print(f"-> {', '.join(subjects)}")
-#
-#     print("\nBeispielhafte Aufgaben für 'Mathematik':")
-#     math_tasks = library_1.get_tasks_for_subject("Mathematik")
-#     for task in math_tasks:
-#         print(f"- {task}")
-#
-#     print("\nBeispielhafte Aufgaben für ein nicht existierendes Fach ('Philosophie'):")
-#     philosophy_tasks = library_1.get_tasks_for_subject("Philosophie")
-#     for task in philosophy_tasks:
-#         print(f"- {task}")
+#     lib = ContentLibrary()
+#     print(lib.list_subjects_with_task_counts())
+#     print(lib.get_tasks_for_subject("Mathematik")[:5])
+#     lib.add_task_for_subject("Mathematik", "Graphen analysieren")
+#     print(lib.get_tasks_for_subject("Mathematik")[-3:])
