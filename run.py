@@ -35,7 +35,12 @@ if __name__ == "__main__":
     debug = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
 
     # Determine host based on environment
-    host = "0.0.0.0" if os.environ.get("FLASK_ENV") == "production" else "127.0.0.1"  # nosec
+    # Determine host based on explicit environment variable
+    if os.environ.get("FLASK_BIND_ALL", "false").lower() == "true":
+        host = "0.0.0.0"
+        logging.warning("Binding to 0.0.0.0 (all interfaces). Ensure this is intended and your environment is secure!")
+    else:
+        host = "127.0.0.1"
 
     # Run with appropriate settings
     app.run(
