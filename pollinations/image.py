@@ -95,11 +95,17 @@ class Image:
                     logging.warning(
                         "API returned empty content-type, attempting to process as image anyway"
                     )
-                image = PILImage.open(BytesIO(response.content))
+                try:
+                    image = PILImage.open(BytesIO(response.content))
+                except UnidentifiedImageError:
+                    logging.error("Failed to process response content as an image")
+                    raise RuntimeError(
+                        "Content could not be processed as an image."
+                    )
             else:
                 logging.error("API returned non-image content: %s", response.text)
                 raise RuntimeError("API returned non-image content.")
-        except (UnidentifiedImageError, OSError) as e:
+        except OSError as e:
             raise RuntimeError(f"Failed to decode image: {e}") from e
         if save and file:
             try:
