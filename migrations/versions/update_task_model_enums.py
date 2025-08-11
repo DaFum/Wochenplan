@@ -35,7 +35,7 @@ def upgrade():
     connection = op.get_bind()
     
     # Get existing data
-    result = connection.execute(sa.text("SELECT id, title, description, priority, status, start_time, end_time, [order] FROM task ORDER BY [order]"))
+    result = connection.execute(sa.text('SELECT id, title, description, priority, status, start_time, end_time, "order" FROM task ORDER BY "order"'))
     rows = result.fetchall()
     
     # Insert data into new table
