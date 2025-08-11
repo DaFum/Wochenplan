@@ -123,7 +123,10 @@ class BasicTestCase(unittest.TestCase):
         image_path = os.path.join(
             self.app.static_folder, 'subjects', secure_filename(subject) + '.png'
         )
-        self.addCleanup(lambda: os.remove(image_path) if os.path.exists(image_path) else None)
+        def cleanup_image(path):
+            if os.path.exists(path):
+                os.remove(path)
+        self.addCleanup(cleanup_image, image_path)
 
         resp = self.client.post(
             '/einstellungen', data={'new_subject': subject, 'submit': True}, follow_redirects=True
