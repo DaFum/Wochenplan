@@ -209,19 +209,18 @@ def generate_text():
             session['generated_text'] = generated_text
             return redirect(url_for('main.home'))
 
-        except httpx.HTTPError as e:
-            logger.warning(f"HTTP-Fehler während der Textgenerierung: {e}")
-            message = (
-                "HTTP-Fehler bei der Textgenerierung. Bitte versuchen Sie es später erneut."
-            )
         except (httpx.ConnectError, httpx.TimeoutException) as e:
             logger.warning(f"HTTP-Verbindungsfehler während der Textgenerierung: {e}")
-            message = (
-                "Verbindungsfehler bei der Textgenerierung. Bitte versuchen Sie es später erneut."
-            )
+            message = "Verbindungsfehler bei der Textgenerierung. Bitte versuchen Sie es später erneut."
+            status_code = 503
+        except httpx.HTTPError as e:
+            logger.warning(f"HTTP-Fehler während der Textgenerierung: {e}")
+            message = "HTTP-Fehler bei der Textgenerierung. Bitte versuchen Sie es später erneut."
+            status_code = 502
         except Exception as e:
             logger.error(f"Text generation failed: {e}")
             message = "Textgenerierung fehlgeschlagen. Bitte versuchen Sie es erneut."
+            status_code = 500
 
     if is_ajax:
         return jsonify({'error': message}), status_code
