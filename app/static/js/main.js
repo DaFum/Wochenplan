@@ -136,4 +136,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Load task suggestions from content library
+    const subjectSelect = document.getElementById('learning_subject');
+    const taskSuggestions = document.getElementById('taskSuggestions');
+
+    async function loadTaskSuggestions() {
+        if (!subjectSelect || !taskSuggestions) return;
+        try {
+            const resp = await fetch(`/api/library-tasks/${encodeURIComponent(subjectSelect.value)}`);
+            if (!resp.ok) return;
+            const data = await resp.json();
+            taskSuggestions.innerHTML = '';
+            data.tasks.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t;
+                taskSuggestions.appendChild(opt);
+            });
+        } catch (e) {
+            console.error('Failed to load suggestions', e);
+        }
+    }
+
+    subjectSelect?.addEventListener('change', loadTaskSuggestions);
+    loadTaskSuggestions();
 });

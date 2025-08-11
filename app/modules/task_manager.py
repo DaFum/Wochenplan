@@ -5,27 +5,11 @@
 # ============================================================
 
 import logging
-import uuid
 from datetime import datetime
-from enum import Enum
 from typing import List, Optional
 
-from app.models import Task
+from app.models import Task, TaskPriority, TaskStatus
 from app import db
-
-
-class TaskStatus(Enum):
-    """Definiert den Status einer Aufgabe."""
-    OPEN = "OPEN"
-    IN_PROGRESS = "IN_PROGRESS"
-    COMPLETED = "COMPLETED"
-
-
-class TaskPriority(Enum):
-    """Definiert die Priorität einer Aufgabe."""
-    LOW = "LOW"
-    MEDIUM = "MEDIUM"
-    HIGH = "HIGH"
 
 
 class TaskManager:
@@ -41,22 +25,20 @@ class TaskManager:
         title: str,
         description: Optional[str] = None,
         priority: TaskPriority = TaskPriority.MEDIUM,
-        start_time: Optional[datetime] = None,
-        end_time: Optional[datetime] = None
+        due_date: Optional[datetime] = None,
     ) -> Task:
         """
-        Erstellt eine neue Aufgabe mit Titel, optionaler Beschreibung, Priorität sowie optionalem Start- und Endzeitpunkt und speichert sie in der Datenbank.
-        
+        Erstellt eine neue Aufgabe mit Titel, optionaler Beschreibung, Priorität sowie optionalem Fälligkeitsdatum und speichert sie in der Datenbank.
+
         Parameters:
             title (str): Titel der Aufgabe. Darf nicht leer sein.
             description (Optional[str]): Optionale Beschreibung der Aufgabe.
             priority (TaskPriority): Priorität der Aufgabe (Standard: MEDIUM).
-            start_time (Optional[datetime]): Optionaler Startzeitpunkt.
-            end_time (Optional[datetime]): Optionaler Endzeitpunkt.
-        
+            due_date (Optional[datetime]): Optionales Fälligkeitsdatum.
+
         Returns:
             Task: Das erstellte Aufgabenobjekt.
-        
+
         Raises:
             ValueError: Wenn der Titel leer ist.
         """
@@ -65,12 +47,10 @@ class TaskManager:
 
         max_order = db.session.query(db.func.max(Task.order)).scalar() or 0
         new_task = Task(
-            id=str(uuid.uuid4()),
             title=title,
             description=description,
-            priority=priority.name,
-            start_time=start_time,
-            end_time=end_time,
+            priority=priority,
+            due_date=due_date,
             order=max_order + 1,
         )
         db.session.add(new_task)
@@ -98,7 +78,7 @@ class TaskManager:
         """
         task = self.get_task(task_id)
         if task:
-            task.status = status.name
+            task.status = status
             db.session.commit()
             logging.info(
                 f"Status von Aufgabe {task_id} auf {status.name} geändert."
@@ -113,8 +93,7 @@ class TaskManager:
         title: Optional[str] = None,
         description: Optional[str] = None,
         priority: Optional[TaskPriority] = None,
-        start_time: Optional[datetime] = None,
-        end_time: Optional[datetime] = None,
+        due_date: Optional[datetime] = None,
     ) -> bool:
         """Aktualisiert eine bestehende Aufgabe.
 
@@ -132,13 +111,10 @@ class TaskManager:
         if description is not None:
             task.description = description
         if priority is not None:
-            task.priority = (
-                priority.name if isinstance(priority, TaskPriority) else priority
-            )
-        if start_time is not None:
-            task.start_time = start_time
-        if end_time is not None:
-            task.end_time = end_time
+        if priority is not None:
+            task.priority = priority.name
+        if due_date is not None:
+            task.due_date = due_date
         db.session.commit()
         logging.info(f"Aufgabe {task_id} aktualisiert.")
         return True
@@ -212,8 +188,42 @@ class TaskManager:
             ]
             for t in affected_tasks:
                 t.order -= 1
+def reorder_task(self, task_id: str, new_position: int) -> bool:
+    """Verschiebt eine Aufgabe an eine neue Position in der Liste."""
+    task = self.get_task(task_id)
+    if not task:
+        logging.warning(f"Versuch, eine nicht existierende Aufgabe zu verschieben: {task_id}")
+        return False
 
-        task.order = new_position
+    old_position = task.order
+    new_order = new_position + 1
+
+    if old_position == new_order:
+        return True  # Nichts zu tun
+
+    if new_order > old_position:
+        # Nach unten verschieben
+        affected_tasks = Task.query.filter(
+            Task.order > old_position, Task.order <= new_order
+        ).all()
+        for t in affected_tasks:
+            t.order -= 1
+    else:
+        # Nach oben verschieben
+        affected_tasks = Task.query.filter(
+            Task.order >= new_order, Task.order < old_position
+        ).all()
+        for t in affected_tasks:
+            t.order += 1
+
+    task.order = new_order
+    db.session.commit()
+    logging.info(
+        f"Aufgabe {task_id} wurde an Position {new_position} verschoben."
+    )
+    return True
+    if old_position == new_order:
+        return True
         db.session.commit()
         logging.info(
             f"Aufgabe {task_id} wurde an Position {new_position} verschoben."

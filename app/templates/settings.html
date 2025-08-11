@@ -15,18 +15,24 @@
                 <h5 class="mb-0">Fächer</h5>
             </div>
             <div class="card-body">
-                <form method="POST" class="mb-3 d-flex">
-                    <input type="hidden" name="action" value="add">
-                    <input type="text" name="subject" class="form-control me-2" placeholder="Neues Fach" required>
-                    <button type="submit" class="btn btn-primary" title="Fügt ein neues Fach hinzu und lädt die Seite neu">Hinzufügen</button>
+                <form method="POST" action="{{ url_for('main.settings') }}" class="mb-3 d-flex">
+                    {{ form.hidden_tag() }}
+                    {{ form.new_subject(class='form-control me-2', placeholder='Neues Fach') }}
+                    {{ form.submit(class='btn btn-primary', title='Fügt ein neues Fach hinzu und lädt die Seite neu') }}
                 </form>
                 <ul class="list-group">
-                    {% for subject in subjects %}
+                    {% for item in subjects %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>{{ subject }}</span>
-                        <form method="POST" class="m-0">
+                        <span>
+                            {% if item.image_url %}
+                            <img src="{{ item.image_url }}" alt="{{ item.name }}" width="32" class="me-2">
+                            {% endif %}
+                            {{ item.name }}
+                        </span>
+                        <form method="POST" action="{{ url_for('main.settings') }}" class="m-0">
+                            {{ csrf_token() }}
                             <input type="hidden" name="action" value="remove">
-                            <input type="hidden" name="subject" value="{{ subject }}">
+                            <input type="hidden" name="subject" value="{{ item.name }}">
                             <button type="submit" class="btn btn-sm btn-danger">Entfernen</button>
                         </form>
                     </li>
