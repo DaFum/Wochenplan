@@ -1,4 +1,19 @@
 from . import db
+from enum import Enum
+
+
+class TaskStatus(Enum):
+    """Enumeration der möglichen Statuswerte für eine Aufgabe."""
+    OPEN = "OPEN"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
+
+
+class TaskPriority(Enum):
+    """Enumeration der Prioritätsstufen für Aufgaben."""
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
 
 
 class Subject(db.Model):
@@ -37,13 +52,12 @@ class PlannerEntry(db.Model):
 
 
 class Task(db.Model):
-    id = db.Column(db.String(36), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(200))
-    priority = db.Column(db.String(20), default='MEDIUM')
-    status = db.Column(db.String(20), default='OPEN')
-    start_time = db.Column(db.DateTime)
-    end_time = db.Column(db.DateTime)
+    priority = db.Column(db.Enum(TaskPriority), default=TaskPriority.MEDIUM, nullable=False)
+    status = db.Column(db.Enum(TaskStatus), default=TaskStatus.OPEN, nullable=False)
+    due_date = db.Column(db.DateTime)
     order = db.Column(db.Integer, default=0, nullable=False)
 
     def __repr__(self):

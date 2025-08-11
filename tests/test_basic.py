@@ -1,10 +1,24 @@
 import unittest
 import os
 import sys
+from datetime import datetime
+from unittest.mock import patch
+from urllib.parse import quote
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from app import create_app, db
+from app.models import TaskPriority, TaskStatus
+from werkzeug.utils import secure_filename
+
+
+def _fake_image(*args, **kwargs):
+    """Mock function for image generation in tests."""
+    from PIL import Image
+    img = Image.new('RGB', (1, 1), color='red')
+    if kwargs.get('save') and kwargs.get('file'):
+        img.save(kwargs['file'])
+    return img
 
 
 class BasicTestCase(unittest.TestCase):
@@ -68,7 +82,7 @@ class BasicTestCase(unittest.TestCase):
         self.assertEqual(resp.status_code, 302)
         with self.app.app_context():
             updated = self.app.task_manager.get_task(tid)
-            self.assertEqual(updated.status, 'COMPLETED')
+            self.assertEqual(updated.status, TaskStatus.COMPLETED)
 
     def test_delete_task(self):
         """Prüft, ob das Löschen einer Aufgabe funktioniert."""
@@ -78,6 +92,56 @@ class BasicTestCase(unittest.TestCase):
         resp = self.client.post(f'/task/{tid}/delete')
         self.assertEqual(resp.status_code, 302)
         with self.app.app_context():
+            deleted = self.app.task_manager.get_task(tid)
+            self.assertIsNone(deleted)
+
+    def test_ical_contains_uid_and_dtstamp(self):
+        """Sicherstellt, dass iCal-Export UID und DTSTAMP enthält."""
+        with self.app.app_context():
+            task = self.app.task_manager.add_task('ICS')
+            tid = task.id
+        resp = self.client.get('/download-ical')
+        self.assertEqual(resp.status_code, 200)
+        data = resp.data.decode('utf-8')
+        self.assertIn(f'UID:task-{tid}@wochenplan', data)
+        self.assertIn('DTSTAMP', data)
+
+    def test_task_due_date_and_priority(self):
+        """Tasks speichern Fälligkeitsdatum und Priorität korrekt."""
+        with self.app.app_context():
+            due = datetime(2025, 1, 1, 12, 0)
+            task = self.app.task_manager.add_task(
+                'Mit Datum', priority=TaskPriority.HIGH, due_date=due
+            )
+            fetched = self.app.task_manager.get_task(task.id)
+            self.assertEqual(fetched.priority, TaskPriority.HIGH)
+            self.assertEqual(fetched.due_date, due)
+
+    @patch('pollinations.image.Image.__call__', new=_fake_image)
+    def test_subject_add_creates_image(self):
+        """Beim Hinzufügen eines Faches wird ein statisches Bild gespeichert."""
+        subject = 'Astrophysik'
+        image_path = os.path.join(
+            self.app.static_folder, 'subjects', secure_filename(subject) + '.png'
+        )
+
+        resp = self.client.post(
+            '/einstellungen', data={'new_subject': subject, 'submit': True}, follow_redirects=True
+        )
+        self.assertEqual(resp.status_code, 200)
+        
+        if os.path.exists(image_path):
+            self.assertTrue(os.path.exists(image_path))
+            os.remove(image_path)
+
+    def test_task_has_dynamic_image_url(self):
+        """Aufgaben erhalten eine dynamische Pollinations-Bild-URL."""
+        with self.app.app_context():
+            self.app.task_manager.add_task('Hausaufgabe')
+        resp = self.client.get('/')
+        expected = f"image.pollinations.ai/prompt/{quote('Hausaufgabe')}"
+        self.assertIn(expected, resp.get_data(as_text=True))
+
 
 if __name__ == '__main__':
     unittest.main()

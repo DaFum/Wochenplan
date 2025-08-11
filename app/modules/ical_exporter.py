@@ -36,6 +36,12 @@ class ICalExporter:
             event.end = event_data["end"]
             if "description" in event_data:
                 event.description = event_data["description"]
+            
+            # Add UID and DTSTAMP if provided
+            event.uid = event_data.get("uid") or f"event-{id(event_data)}@wochenplan"
+            if "dtstamp" in event_data:
+                event.created = event_data["dtstamp"]
+            
             cal.events.add(event)
 
         if not cal.events:

@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 import io
 
-from flask import send_file, render_template
+from flask import send_file, render_template, current_app
 from weasyprint import HTML
 
 from app.modules.ical_exporter import ICalExporter
@@ -13,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 ical_exporter = ICalExporter()
 task_manager = TaskManager()
+
+
 @exports_bp.route('/download-ical')
 def download_ical():
     """
@@ -22,14 +25,29 @@ def download_ical():
     """
     tasks = task_manager.list_tasks()
     events = []
+    tz = ZoneInfo(current_app.config.get('DEFAULT_TIMEZONE', 'Europe/Berlin'))
+    
     for task in tasks:
-        start_time = task.start_time or datetime.now()
-        end_time = task.end_time or start_time + timedelta(hours=1)
+        # Use due_date if available, fallback to current time
+        due_date = getattr(task, 'due_date', None) or datetime.now()
+        
+        # Handle timezone-aware datetime
+        if due_date.tzinfo is None:
+            # Naive datetime, attach Berlin timezone
+            due_date = due_date.replace(tzinfo=tz)
+        else:
+            # Already timezone-aware, convert to Berlin timezone
+            due_date = due_date.astimezone(tz)
+        
+        end_time = due_date + timedelta(hours=1)
+        
         events.append({
             "summary": task.title,
-            "start": start_time,
+            "start": due_date,
             "end": end_time,
-            "description": getattr(task, 'description', '') or ''
+            "description": getattr(task, 'description', '') or '',
+            "uid": f"task-{task.id}@wochenplan",
+            "dtstamp": datetime.now(tz)
         })
 
     try:
@@ -47,6 +65,7 @@ def download_ical():
         download_name='wochenplan.ics',
         mimetype='text/calendar'
     )
+
 
 @exports_bp.route('/download-pdf')
 def download_pdf():
