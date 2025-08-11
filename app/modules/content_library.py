@@ -235,6 +235,8 @@ class ContentLibrary:
         """
         if not task or not isinstance(task, str):
             return False
+        if not isinstance(subject, str) or not subject.strip():
+            return False
         if subject not in self._subjects:
             # Option: automatisches Anlegen: auskommentieren falls nicht erwünscht
             self.add_subject(subject)
