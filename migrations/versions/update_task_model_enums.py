@@ -40,21 +40,24 @@ def upgrade():
     
     # Insert data into new table
     for i, row in enumerate(rows, 1):
+        # Get column values by name instead of position
+        row_dict = dict(row._mapping)
+    
         # Map string priority to enum
         priority_map = {
             'LOW': 'LOW',
             'MEDIUM': 'MEDIUM', 
             'HIGH': 'HIGH'
         }
-        priority = priority_map.get(row[3], 'MEDIUM')  # Default to MEDIUM
-        
+        priority = priority_map.get(row_dict.get('priority', 'MEDIUM'), 'MEDIUM')
+    
         # Map string status to enum  
         status_map = {
             'OPEN': 'OPEN',
             'IN_PROGRESS': 'IN_PROGRESS',
             'COMPLETED': 'COMPLETED'
         }
-        status = status_map.get(row[4], 'OPEN')  # Default to OPEN
+        status = status_map.get(row_dict.get('status', 'OPEN'), 'OPEN')
         
         # Use start_time as due_date if available
         due_date = row[5]  # start_time from old schema
