@@ -67,13 +67,24 @@ def settings():
     if request.method == 'POST':
         action = request.form.get('action')
         subject = request.form.get('subject')
-        if action == 'add' and subject:
-            current_app.content_library.add_subject(subject)
-        elif action == 'remove' and subject:
-            current_app.content_library.remove_subject(subject)
+        try:
+            if action == 'add' and subject:
+                current_app.content_library.add_subject(subject)
+                flash(f"Fach '{subject}' hinzugefügt.", "success")
+            elif action == 'remove' and subject:
+                current_app.content_library.remove_subject(subject)
+                flash(f"Fach '{subject}' entfernt.", "success")
+        except Exception as e:
+            logger.error(f"Error managing subjects: {e}")
+            flash("Fehler beim Verwalten der Fächer.", "error")
         return redirect(url_for('main.settings'))
 
-    subjects = current_app.content_library.get_subjects()
+    try:
+        subjects = current_app.content_library.get_subjects()
+    except Exception as e:
+        logger.error(f"Failed to load subjects: {e}")
+        subjects = []
+        flash("Fächer konnten nicht geladen werden.", "warning")
     return render_template('settings.html', subjects=subjects)
 
 
