@@ -159,10 +159,19 @@ class TaskManager:
           logging.error(f"Aufgabe mit ID {task_id} nicht gefunden.")
           return False
 
+      # Validiere new_position
+      if new_position < 0:
+          logging.error(f"Ungültige Position: {new_position} (muss >= 0 sein)")
+          return False
+
       # Fetch all tasks ordered by 'order'
       tasks = Task.query.order_by(Task.order).all()
       # Remove the target task by id for efficiency
       tasks = [t for t in tasks if t.id != task.id]
+
+      # Begrenze new_position auf gültigen Bereich
+      new_position = min(new_position, len(tasks))
+
       # Insert the task at the desired new position
       tasks.insert(new_position, task)
       # Update order field for all tasks
