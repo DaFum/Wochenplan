@@ -99,6 +99,7 @@ def settings():
         subject = form.new_subject.data.strip()
         try:
             if current_app.content_library.add_subject(subject):
+                image_generated = False
                 try:
                     filename = secure_filename(f"{subject}.png")
                     folder = os.path.join(current_app.static_folder, 'subjects')
@@ -112,9 +113,13 @@ def settings():
                             width=256,
                             height=256,
                         )
+                    image_generated = True
                 except Exception as img_err:
                     logger.error(f"Image generation failed for subject {subject}: {img_err}")
-                flash(f"Fach '{subject}' hinzugefügt.", "success")
+                if image_generated:
+                    flash(f"Fach '{subject}' hinzugefügt.", "success")
+                else:
+                    flash(f"Fach '{subject}' hinzugefügt, aber Bildgenerierung fehlgeschlagen.", "warning")
             else:
                 flash("Fach konnte nicht hinzugefügt werden.", "error")
         except Exception as e:
