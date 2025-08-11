@@ -14,11 +14,11 @@
         <div class="header">
             <h1>Wochenplan</h1>
             <div>
-                <a href="{{ url_for('main.settings') }}" class="btn">Einstellungen</a>
+                <a href="{{ url_for('main.settings') }}" class="btn btn-light" title="Zur Einstellungsseite wechseln">Einstellungen</a>
                 <a href="{{ url_for('exports.download_ical') }}" class="btn">iCal-Export</a>
             </div>
         </div>
-        <button id="darkModeToggle" class="btn btn-secondary mt-3">Dunkelmodus umschalten</button>
+        <button id="darkModeToggle" class="btn btn-secondary mt-3" title="Schaltet den Dunkelmodus um, ohne die Seite neu zu laden">Dunkelmodus umschalten</button>
         <input type="text" id="searchInput" class="form-control mt-3" placeholder="Suche nach Fach oder Material">
         <ul class="nav nav-tabs" id="weekdaysTabs" role="tablist">
             {% for day in days %}
@@ -43,7 +43,7 @@
                         {{ form.learning_task.label(class="form-label") }}
                         {{ form.learning_task(class="form-control") }}
                     </div>
-                    {{ form.submit(class="btn btn-primary") }}
+                    {{ form.submit(class="btn btn-primary", title="Speichert die Aufgabe, zeigt eine Bestätigung und lädt die Seite neu") }}
                 </form>
             </div>
         </div>
@@ -94,20 +94,18 @@
                 <h5 class="mb-0">KI-Textgenerator</h5>
             </div>
             <div class="card-body">
-                <form method="POST" action="{{ url_for('main.generate_text') }}">
+                <form method="POST" action="{{ url_for('main.generate_text') }}" id="textGenForm">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                         <label for="prompt" class="form-label">Prompt</label>
                         <textarea class="form-control" id="prompt" name="prompt" rows="3"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Text generieren</button>
+                    <button type="submit" class="btn btn-primary" title="Generiert Text ohne die Seite neu zu laden">Text generieren</button>
                 </form>
-                {% if generated_text %}
-                <div class="mt-3">
+                <div id="generatedTextContainer" class="mt-3" {% if not generated_text %}style="display:none;"{% endif %}>
                     <h6>Generierter Text:</h6>
-                    <p>{{ generated_text }}</p>
+                    <p id="generatedText">{% if generated_text %}{{ generated_text }}{% endif %}</p>
                 </div>
-                {% endif %}
             </div>
         </div>
     </div>
