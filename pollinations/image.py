@@ -93,7 +93,8 @@ class Image:
             except (UnidentifiedImageError, OSError) as e:
                 raise RuntimeError(f"Failed to decode image: {e}") from e
         else:
-            raise RuntimeError(f"API returned non-image content: {response.text[:100]}...")
+            logging.error("API returned non-image content: %s", response.text)
+            raise RuntimeError("API returned non-image content.")
         if save and file:
             try:
                 image.save(file)
