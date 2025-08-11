@@ -76,34 +76,35 @@ document.addEventListener('DOMContentLoaded', function() {
     // Drag-and-drop reordering for tasks
     const taskList = document.getElementById('taskList');
     if (taskList && typeof Sortable !== 'undefined') {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        let prevOrder = [];
         new Sortable(taskList, {
             animation: 150,
-            onEnd: () => {
-                Array.from(taskList.children).forEach((el, index) => {
-                    const id = el.getAttribute('data-id');
-                    fetch(`/task/${id}/reorder`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ position: index })
-                // Store previous order in case we need to revert
-                const prevOrder = Array.from(taskList.children).map(el => el);
-                const fetches = Array.from(taskList.children).map((el, index) => {
+            onStart: () => {
+                // Reihenfolge VOR dem Drag erfassen (echter vorheriger Zustand)
+                prevOrder = Array.from(taskList.children);
+            },
+            onEnd: async () => {
+                const items = Array.from(taskList.children);
+                const headers = {
+                    'Content-Type': 'application/json',
+                    ...(csrfToken ? { 'X-CSRFToken': csrfToken } : {})
+                };
+                const requests = items.map((el, index) => {
                     const id = el.getAttribute('data-id');
                     return fetch(`/task/${id}/reorder`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers,
                         body: JSON.stringify({ position: index })
                     });
                 });
-                Promise.all(fetches.map(p => p.catch(e => e)))
-                    .then(results => {
-                        const hasError = results.some(r => r instanceof Error || (r && !r.ok));
-                        if (hasError) {
-                            // Revert UI to previous order
-                            prevOrder.forEach(el => taskList.appendChild(el));
-                            alert('Failed to reorder tasks. Please try again.');
-                        }
-                    });
+                const results = await Promise.all(requests.map(p => p.catch(e => e)));
+                const hasError = results.some(r => r instanceof Error || (r && !r.ok));
+                if (hasError) {
+                    // UI zurücksetzen
+                    prevOrder.forEach(el => taskList.appendChild(el));
+                    alert('Failed to reorder tasks. Please try again.');
+                }
             }
         });
     }
