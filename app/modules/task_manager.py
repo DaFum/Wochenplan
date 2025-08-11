@@ -160,7 +160,6 @@ class TaskManager:
             return False
 
         tasks = Task.query.order_by(Task.order).all()
-        if task in tasks:
         # Remove the task from the list by id to avoid O(n) 'in' check
         tasks = [t for t in tasks if t.id != task.id]
         tasks.insert(new_position, task)
