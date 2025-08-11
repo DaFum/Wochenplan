@@ -88,18 +88,13 @@ class Image:
         params.update(kwargs)
         response = self._sync_client.get(self._build_url(prompt), params=params)
         response.raise_for_status()
-        content_type = response.headers.get('content-type', '')
+        content_type = response.headers.get("content-type", "")
         try:
-            if content_type.startswith('image/') or not content_type:
+            if content_type.startswith("image/") or not content_type:
                 if not content_type:
-                    logging.warning("API returned empty content-type, attempting to process as image anyway")
-                image = PILImage.open(BytesIO(response.content))
-                logging.warning("API returned empty content-type, attempting to process as image anyway")
-                image = PILImage.open(BytesIO(response.content))
-            elif content_type.startswith('image/'):
-            if content_type.startswith('image/') or not content_type:
-                if not content_type:
-                    logging.warning("API returned empty content-type, attempting to process as image anyway")
+                    logging.warning(
+                        "API returned empty content-type, attempting to process as image anyway"
+                    )
                 image = PILImage.open(BytesIO(response.content))
             else:
                 logging.error("API returned non-image content: %s", response.text)
