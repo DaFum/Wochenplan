@@ -105,4 +105,35 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Asynchronous text generation
+    const textGenForm = document.getElementById('textGenForm');
+    if (textGenForm) {
+        textGenForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            const formData = new FormData(textGenForm);
+            try {
+                const response = await fetch(textGenForm.action, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                });
+                const data = await response.json();
+                if (response.ok && data.generated_text) {
+                    const container = document.getElementById('generatedTextContainer');
+                    const textEl = document.getElementById('generatedText');
+                    if (container && textEl) {
+                        textEl.textContent = data.generated_text;
+                        container.style.display = '';
+                    }
+                } else if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert('Fehler bei der Textgenerierung.');
+                }
+            } catch {
+                alert('Fehler bei der Textgenerierung.');
+            }
+        });
+    }
 });
