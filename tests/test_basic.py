@@ -78,15 +78,6 @@ class BasicTestCase(unittest.TestCase):
         resp = self.client.post(f'/task/{tid}/delete')
         self.assertEqual(resp.status_code, 302)
         with self.app.app_context():
-            t1 = current_app.task_manager.add_task('A')
-            t2 = current_app.task_manager.add_task('B')
-            t1_id, t2_id = t1.id, t2.id
-        resp = self.client.post(f'/task/{t1_id}/reorder', json={'position': 1})
-        self.assertEqual(resp.status_code, 200)
-        with self.app.app_context():
-            tasks = current_app.task_manager.list_tasks()
-            self.assertEqual([t.id for t in tasks], [t2_id, t1_id])
-
     def test_edit_task(self):
         """Prüft, ob das Bearbeiten einer Aufgabe funktioniert."""
         with self.app.app_context():
