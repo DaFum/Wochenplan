@@ -54,9 +54,14 @@ def home():
 
     if form.validate_on_submit() and request.form.get('form_context') == 'add_task':
         try:
+            try:
+                priority = TaskPriority[form.priority.data]
+            except KeyError:
+                flash("Ungültige Priorität ausgewählt.", "error")
+                return redirect(url_for('main.home'))
             current_app.task_manager.add_task(
                 title=form.learning_task.data,
-                priority=TaskPriority[form.priority.data],
+                priority=priority,
                 due_date=form.due_date.data,
             )
             flash("Aufgabe erfolgreich hinzugefügt!", "success")
