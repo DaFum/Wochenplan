@@ -18,7 +18,7 @@
                 <a href="{{ url_for('exports.download_ical') }}" class="btn">iCal-Export</a>
             </div>
         </div>
-        <button id="darkModeToggle" class="btn btn-secondary mt-3" title="Schaltet den Dunkelmodus um, ohne die Seite neu zu laden">Dunkelmodus umschalten</button>
+        <button id="darkModeToggle" class="btn btn-secondary dark-mode-toggle" title="Schaltet den Dunkelmodus um, ohne die Seite neu zu laden">Dunkelmodus umschalten</button>
         <input type="text" id="searchInput" class="form-control mt-3" placeholder="Suche nach Fach oder Material">
         <ul class="nav nav-tabs" id="weekdaysTabs" role="tablist">
             {% for day in days %}
@@ -111,14 +111,7 @@
                 <h5 class="mb-0">KI-Textgenerator</h5>
             </div>
             <div class="card-body">
-                <form method="POST" action="{{ url_for('main.generate_text') }}" id="textGenForm">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <div class="mb-3">
-                        <label for="prompt" class="form-label">Prompt</label>
-                        <textarea class="form-control" id="prompt" name="prompt" rows="3"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary" title="Generiert Text ohne die Seite neu zu laden">Text generieren</button>
-                </form>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#promptModal">Prompt eingeben</button>
                 <div id="generatedTextContainer" class="mt-3" {% if not generated_text %}style="display:none;"{% endif %}>
                     <h6>Generierter Text:</h6>
                     <p id="generatedText">{% if generated_text %}{{ generated_text }}{% endif %}</p>
@@ -126,9 +119,36 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="promptModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="{{ url_for('main.generate_text') }}" id="textGenForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title">KI-Textgenerator</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="mb-3">
+                            <label for="prompt" class="form-label">Prompt</label>
+                            <textarea class="form-control" id="prompt" name="prompt" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Text generieren</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="confettiCanvas"></canvas>
+
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/gsap.min.js" integrity="sha384-EXoMlsRz5LeM9I+svMr9NrSRlZc4GWlywJ430KvHETR8/bMX6mTyTLWdE/8GLWOF" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js" integrity="sha512-Eezs+g9Lq4TCCq0wae01s9PuNWzHYoCMkE97e2qdkYthpI0pzC3UGB03lgEHn2XM85hDOUF6qgqqszs+iXU4UA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

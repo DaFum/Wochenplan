@@ -125,6 +125,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (container && textEl) {
                         textEl.textContent = data.generated_text;
                         container.style.display = '';
+                        if (typeof confetti === 'function') {
+                            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                        }
                     }
                 } else if (data.error) {
                     alert(data.error);

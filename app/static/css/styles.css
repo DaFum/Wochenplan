@@ -79,24 +79,43 @@ body {
 
 .navbar {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
 }
 
-.nav-list {
+.navbar ul {
     list-style: none;
     display: flex;
     gap: 20px;
+    padding: 0;
+    margin: 0;
 }
 
-.nav-list a {
+.navbar a {
     color: var(--color-light);
     text-decoration: none;
     font-weight: bold;
     transition: color 0.3s;
 }
 
-.nav-list a:hover {
+.navbar a:hover {
     color: var(--color-accent);
+}
+
+/* Modal and confetti styles */
+#promptModal .modal-content {
+    border-radius: 20px;
+}
+
+#confettiCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2000;
 }
 
 .nav-tabs .nav-link {
@@ -396,5 +415,18 @@ body, .card, .button, .planner {
         top: 10px;
         right: 10px;
         padding: 8px;
+    }
+}
+
+@media (max-width: 576px) {
+    .planner {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .dark-mode-toggle {
+        position: static;
+        width: 100%;
+        margin-top: 10px;
     }
 }
